@@ -1,5 +1,5 @@
 
-import 'package:eventos_app/presentation/widgets/widgets.dart';
+import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {

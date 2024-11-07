@@ -12,6 +12,18 @@ final registerFormProvider = StateNotifierProvider.autoDispose<RegisterFormNotif
 class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
   RegisterFormNotifier(): super(RegisterFormState());
 
+  void onFullNameChanged(String value) {
+    state = state.copyWith(fullName: value);
+  }
+
+  void onCompanyNameChanged(String value) {
+    state = state.copyWith(companyName: value);
+  }
+
+  void onNifChanged(String value) {
+    state = state.copyWith(nif: value);
+  }
+
   void onEmailChanged(String value) {
     final newEmail = Email.dirty(value: value);
     state = state.copyWith(
@@ -19,6 +31,24 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
       isValid: Formz.validate([newEmail]),
     );
   }
+
+  void onTelefonoChanged(String value) {
+    state = state.copyWith(telefono: value);
+  }
+
+  void onSectorChanged(String value) {
+    state = state.copyWith(sector: value);
+  }
+
+  void onAceptaTerminosChanged(bool value) {
+    state = state.copyWith(aceptaTerminos: value);
+  }
+
+  void onAceptaComunicacionesChanged(bool value) {
+    state = state.copyWith(aceptaComunicaciones: value);
+  }
+
+
 
   onFormSubmit(){
     _touchEveryField();
@@ -32,10 +62,26 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
 
   _touchEveryField() {
     final email = Email.dirty(value: state.email.value);
+    final fullName = state.fullName.isNotEmpty ? state.fullName : 'El campo es requerido';
+    final companyName = state.companyName.isNotEmpty ? state.companyName : 'El campo es requerido';
+    final nif = state.nif.isNotEmpty ? state.nif : 'El campo es requerido';
+    final telefono = state.telefono.isNotEmpty ? state.telefono : 'El campo es requerido';
+    final sector = state.sector.isNotEmpty ? state.sector : 'El campo es requerido';
+
+    final aceptaTerminos = state.aceptaTerminos;
+    final aceptaComunicaciones = state.aceptaComunicaciones ?? false; 
+    
 
     state = state.copyWith(
       isFormPosted: true,
+      fullName: fullName,
+      companyName: companyName,
+      nif: nif,
       email: email,
+      telefono: telefono,
+      sector: sector,
+      aceptaTerminos: aceptaTerminos,
+      aceptaComunicaciones: aceptaComunicaciones,
       isValid: Formz.validate([email]),
     );
   }

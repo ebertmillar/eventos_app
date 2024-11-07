@@ -60,9 +60,6 @@ class _RegisterForm extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final registerForm = ref.watch(registerFormProvider);
 
-  bool isCheckedTerminos = false; // Estado para "Acepto los términos"
-  bool isCheckedComunicaciones = false; // Estado para "Acepto condiciones comerciales"
-
   String? selectedSector;
     
     final List<String> sectorOptions = [
@@ -82,25 +79,28 @@ class _RegisterForm extends ConsumerWidget {
           CustomTextFormField(
             label: 'Nombre completo', 
             hint: 'Tu nombre completo',
-            
+            keyboardType: TextInputType.text,
+            onChanged: ref.read(registerFormProvider.notifier).onFullNameChanged,         
           ),
                     
           CustomTextFormField(
             label: 'Nombre de la empresa', 
             hint: 'El nombre de la empresa',
-           
-           
+            keyboardType: TextInputType.text,
+            onChanged: ref.read(registerFormProvider.notifier).onCompanyNameChanged,             
           ),
           
           CustomTextFormField(
             label: 'NIF/NIE', 
             hint: 'Tu NIE o NIF de la empresa',
-            
+            keyboardType: TextInputType.text,
+            onChanged: ref.read(registerFormProvider.notifier).onNifChanged,    
           ),
           
           CustomTextFormField(
             label: 'Email', 
             hint: 'Correo Electrónico',
+            keyboardType: TextInputType.emailAddress,
             onChanged: (value) => ref.read(registerFormProvider.notifier).onEmailChanged(value),
             errorMessage: registerForm.isFormPosted ? registerForm.email.errorMessage : null,
           ),
@@ -132,9 +132,13 @@ class _RegisterForm extends ConsumerWidget {
 
               Expanded(
                 flex: 2,
+                
                 child: CustomTextFormField(
+                  onChanged: ref.read(registerFormProvider.notifier).onTelefonoChanged,
                   label: 'Teléfono', 
-                  hint: '555 555 555'),
+                  hint: '555 555 555'
+                ),
+               
               ),              
             ],
           ),
@@ -147,6 +151,7 @@ class _RegisterForm extends ConsumerWidget {
             items: sectorOptions,
             selectedValue: selectedSector,
             onChanged: (String? newValue) {
+              ref.read(registerFormProvider.notifier).onSectorChanged(newValue ?? '');
             },
                   ),
                   
@@ -154,17 +159,17 @@ class _RegisterForm extends ConsumerWidget {
 
           CustomCheckBox(
             label: 'Acepto los términos y condiciones',
-            value: isCheckedTerminos,
+            value: ref.watch(registerFormProvider).aceptaTerminos,
             onChanged: (newValue) {
-              
+              ref.read(registerFormProvider.notifier).onAceptaTerminosChanged(newValue ?? false);
             },
           ),
           // Usando CustomCheckBox para "Acepto condiciones comerciales"
           CustomCheckBox(
             label: 'Acepto condiciones comerciales',
-            value: isCheckedComunicaciones,
+            value: ref.watch(registerFormProvider).aceptaComunicaciones ?? false,
             onChanged: (newValue) {
-              
+              ref.read(registerFormProvider.notifier).onAceptaComunicacionesChanged(newValue ?? false);
             },
           ),
                    

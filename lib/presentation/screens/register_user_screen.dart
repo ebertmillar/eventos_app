@@ -1,6 +1,8 @@
+import 'package:eventos_app/presentation/providers/register_form_provider.dart';
 import 'package:eventos_app/presentation/shared/widgets/custom_checkbox.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RegisterUserScreen extends StatelessWidget {
   const RegisterUserScreen({super.key});
@@ -51,14 +53,12 @@ class RegisterUserScreen extends StatelessWidget {
 
 }
 
-class _RegisterForm extends StatefulWidget {
+class _RegisterForm extends ConsumerWidget {
   const _RegisterForm();
 
   @override
-  State<_RegisterForm> createState() => _RegisterFormState();
-}
-
-class _RegisterFormState extends State<_RegisterForm> {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final registerForm = ref.watch(registerFormProvider);
 
   bool isCheckedTerminos = false; // Estado para "Acepto los términos"
   bool isCheckedComunicaciones = false; // Estado para "Acepto condiciones comerciales"
@@ -73,9 +73,6 @@ class _RegisterFormState extends State<_RegisterForm> {
       'Comercio',
       'Manufactura',
     ];      
-
-  @override
-  Widget build(BuildContext context) {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -104,6 +101,8 @@ class _RegisterFormState extends State<_RegisterForm> {
           CustomTextFormField(
             label: 'Email', 
             hint: 'Correo Electrónico',
+            onChanged: (value) => ref.read(registerFormProvider.notifier).onEmailChanged(value),
+            errorMessage: registerForm.isFormPosted ? registerForm.email.errorMessage : null,
           ),
           
           //Numero de telefono y prefijo
@@ -157,9 +156,7 @@ class _RegisterFormState extends State<_RegisterForm> {
             label: 'Acepto los términos y condiciones',
             value: isCheckedTerminos,
             onChanged: (newValue) {
-              setState(() {
-                isCheckedTerminos = newValue!;
-              });
+              
             },
           ),
           // Usando CustomCheckBox para "Acepto condiciones comerciales"
@@ -167,16 +164,17 @@ class _RegisterFormState extends State<_RegisterForm> {
             label: 'Acepto condiciones comerciales',
             value: isCheckedComunicaciones,
             onChanged: (newValue) {
-              setState(() {
-                isCheckedComunicaciones = newValue!;
-              });
+              
             },
           ),
                    
           const SizedBox(height:15),
 
           CustomFilledButton(
-            onPressed: (){},
+            onPressed: (){
+              ref.read(registerFormProvider.notifier).onFormSubmit();
+
+            },
                 
             text: 'Crear cuenta',
             textColor: Colors.amber,

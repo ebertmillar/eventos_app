@@ -1,16 +1,25 @@
 //! state provider
 
+import 'package:eventos_app/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/presentation/shared/infrastucture/inputs/email.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 
 final registerFormProvider = StateNotifierProvider.autoDispose<RegisterFormNotifier,RegisterFormState>((ref) {
-  return RegisterFormNotifier();
+
+  final registerUserCallback = ref.watch(authProvider.notifier).registerUser;
+
+  return RegisterFormNotifier(registerUserCallback: registerUserCallback);
 });
 
 
 class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
-  RegisterFormNotifier(): super(RegisterFormState());
+
+  final Function(String, String, String, String, String, String, bool, bool) registerUserCallback;
+
+  RegisterFormNotifier({
+    required this.registerUserCallback
+  }): super(RegisterFormState());
 
   void onFullNameChanged(String value) {
     state = state.copyWith(fullName: value);
@@ -50,10 +59,21 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
 
 
 
-  onFormSubmit(){
+  onFormSubmit() async {
     _touchEveryField();
 
     if(!state.isValid) return;
+
+    await registerUserCallback(
+    state.fullName, 
+    state.companyName, 
+    state.nif, 
+    state.email.value, 
+    state.telefono, 
+    state.sector, 
+    state.aceptaTerminos, 
+    state.aceptaComunicaciones ?? false
+  );
 
     print(state);
 

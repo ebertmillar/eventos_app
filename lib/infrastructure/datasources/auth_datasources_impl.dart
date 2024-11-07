@@ -32,6 +32,7 @@ class AuthDatasourcesImpl extends AuthDatasource {
       bool aceptaTerminos,
       bool aceptaComunicaciones) async {
     try {
+      
       final response = await dio.post('/auth/register', data: {
         'fullName': fullName,
         'companyName': companyName,
@@ -46,9 +47,29 @@ class AuthDatasourcesImpl extends AuthDatasource {
       final user = UserMapper.userJsonToEntity(response.data);
       return user;
 
+    } on DioException catch (e) {
+      // Manejo de errores HTTP específicos
+      if (e.response != null) {
+        if (e.response?.statusCode == 400) {
+          throw CustomError(e.response?.data['message'] ?? 'Error al registrar');
+        } else if (e.response?.statusCode == 401) {
+          throw WrongCredentials();
+        }
+        throw CustomError('Error del servidor: ${e.response?.statusCode}');
+      }
+      
+      // Manejo de errores de conexión
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw ConnectionTimeout();
+      }
+
+      // Otros errores de red
+      throw CustomError('Error de red: ${e.message}');
     } catch (e) {
-      throw WrongCredentials();
+      // Otros errores no controlados
+      throw CustomError('Error inesperado: $e');
     }
+
 
   }
 }

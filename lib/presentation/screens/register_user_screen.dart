@@ -1,3 +1,4 @@
+import 'package:eventos_app/presentation/widgets/shared/custom_checkbox.dart';
 import 'package:eventos_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -6,39 +7,42 @@ class RegisterUserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final size = MediaQuery.of(context).size;
-    final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
     
-    return Scaffold(
-      appBar: const CustomAppbar(),
+    return const Scaffold(
+      appBar: CustomAppbar(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 25),
-              child: Text('Primero,', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              child: 
+                Text(
+                  'Primero,',
+                  style: TextStyle(fontSize: 25), 
+                ),
             ),
-            const Padding(
+
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 25),
-              child: Text('Creemos una cuenta', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Creamos una cuenta',
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold), 
+                              ),
             ),
-            const SizedBox(height: 10),
-            Container(
-                    height: size.height - 125 , // 50 los dos sizebox + Text's appbar + bottomnav
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: scaffoldBackgroundColor,
-                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(100)),
-                    ),
-                    child: const _RegisterForm()
-                  )
-                  
-          ]
+
+            SizedBox(height: 5),
+
+            SizedBox(
+              width: double.infinity,
+              child: const _RegisterForm(),
+            ),
+
+          ],
         ),
       ),
-      bottomNavigationBar: const CustomNavigationbar(),
+      bottomNavigationBar: CustomNavigationbar(),
     
     );
   }
@@ -47,65 +51,139 @@ class RegisterUserScreen extends StatelessWidget {
 
 }
 
-class _RegisterForm extends StatelessWidget {
+class _RegisterForm extends StatefulWidget {
   const _RegisterForm();
 
+  @override
+  State<_RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<_RegisterForm> {
+
+  bool isCheckedTerminos = false; // Estado para "Acepto los términos"
+  bool isCheckedComunicaciones = false; // Estado para "Acepto condiciones comerciales"
+
+  String? selectedSector;
+    
+    final List<String> sectorOptions = [
+      'Tecnología',
+      'Educación',
+      'Salud',
+      'Finanzas',
+      'Comercio',
+      'Manufactura',
+    ];      
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Column(
         children: [
-          const CustomTextFormField(label: 'Nombre completo', hint: 'Tu nombre completo'),
-          const SizedBox(height: 10),
-          const CustomTextFormField(label: 'Nombre de la empresa', hint: 'El nombre de la empresa'),
-          const SizedBox(height: 10),
-          const CustomTextFormField(label: 'NIF/NIE', hint: 'Tu NIE o NIF de la empresa'),
-          const SizedBox(height: 10),
-          const CustomTextFormField(label: 'Email', hint: 'Correo Electrónico'),
-          const SizedBox(height: 10),
-          const CustomTextFormField(label: 'Teléfono', hint: '555 555 555',),
-          const SizedBox(height: 10),
-          const CustomSectorFormField(label:'Sector', items: ['secto1' , 'sector2'],),
-          const SizedBox(height: 10),
-       
-          Column(mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CheckboxListTile(
-                value: true,
-                onChanged: (value) {
-                  // Lógica para el checkbox
-                },
-                title: const Text('Acepto los términos y condiciones de uso', style: TextStyle(fontSize: 12),),
-                dense: true, // Hace que el CheckboxListTile sea más compacto
-                controlAffinity: ListTileControlAffinity.leading, // Alinea el checkbox a la izquierda
-                visualDensity: const VisualDensity(vertical: -4, horizontal: -4)
-              ),
-              CheckboxListTile(
-                value: true,
-                onChanged: (value) {
-                  // Lógica para el checkbox
-                },
-                title: const Text('Acepto las comunicaciones comerciales', style: TextStyle(fontSize: 12)),
-                dense: true, // Hace que el CheckboxListTile sea más compacto
-                controlAffinity: ListTileControlAffinity.leading, 
-                visualDensity: const VisualDensity(vertical: -4, horizontal: -4),// Alinea el checkbox a la izquierda
-              ),
-            ],
+          
+          CustomTextFormField(
+            label: 'Nombre completo', 
+            hint: 'Tu nombre completo',
+            
           ),
-          const SizedBox(height: 10),
-
-          const CustomFilledButton(
-            text: 'Crear cuenta',
-            textColor: Colors.amber,
+                    
+          CustomTextFormField(
+            label: 'Nombre de la empresa', 
+            hint: 'El nombre de la empresa',
+           
+           
           ),
           
+          CustomTextFormField(
+            label: 'NIF/NIE', 
+            hint: 'Tu NIE o NIF de la empresa',
+            
+          ),
+          
+          CustomTextFormField(
+            label: 'Email', 
+            hint: 'Correo Electrónico',
+          ),
+          
+          //Numero de telefono y prefijo
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    height: 56,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.flag, size: 18),
+                        SizedBox(width: 5),
+                        Text('+34', style: TextStyle(fontSize: 14)), // Country code example
+                      ],
+                    ),
+                ),
+              ),
 
-          const SizedBox(height: 40,)
+              const SizedBox(width: 10),
 
+              Expanded(
+                flex: 2,
+                child: CustomTextFormField(
+                  label: 'Teléfono', 
+                  hint: '555 555 555'),
+              ),              
+            ],
+          ),
+
+                    
+          // Sector Field (Custom Dropdown)
+          CustomDropdownFormField(
+            label: 'Sector',
+            hint: 'Introduce el sector al que te dedicas',
+            items: sectorOptions,
+            selectedValue: selectedSector,
+            onChanged: (String? newValue) {
+            },
+                  ),
+                  
+          const SizedBox(height: 5),
+
+          CustomCheckBox(
+            label: 'Acepto los términos y condiciones',
+            value: isCheckedTerminos,
+            onChanged: (newValue) {
+              setState(() {
+                isCheckedTerminos = newValue!;
+              });
+            },
+          ),
+          // Usando CustomCheckBox para "Acepto condiciones comerciales"
+          CustomCheckBox(
+            label: 'Acepto condiciones comerciales',
+            value: isCheckedComunicaciones,
+            onChanged: (newValue) {
+              setState(() {
+                isCheckedComunicaciones = newValue!;
+              });
+            },
+          ),
+                   
+          const SizedBox(height:15),
+
+          CustomFilledButton(
+            onPressed: (){},
+                
+            text: 'Crear cuenta',
+            textColor: Colors.amber,
+            
+          ), 
+
+          const SizedBox(height:15),        
         ],      
       )
 

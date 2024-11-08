@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:eventos_app/config/config.dart';
 import 'package:eventos_app/domain/domain.dart';
-import 'package:eventos_app/infrastructure/errors/register_errors.dart';
 import 'package:eventos_app/infrastructure/infrastructure.dart';
 
 class AuthDatasourcesImpl extends AuthDatasource {
@@ -33,7 +32,7 @@ class AuthDatasourcesImpl extends AuthDatasource {
       bool aceptaComunicaciones) async {
     try {
       
-      final response = await dio.post('/auth/register', data: {
+      final response = await dio.post('/api/auth/register', data: {
         'fullName': fullName,
         'companyName': companyName,
         'nif': nif,

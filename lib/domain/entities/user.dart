@@ -1,10 +1,10 @@
 
 class User {
     final String id;
-    final String email;
     final String fullName;
     final String companyName;
     final String nif;
+    final String email;
     final String telefono;
     final String sector;
     final bool isActive;
@@ -15,10 +15,10 @@ class User {
 
     User({
         required this.id,
-        required this.email,
         required this.fullName,
         required this.companyName,
         required this.nif,
+        required this.email,
         required this.telefono,
         required this.sector,
         required this.isActive,

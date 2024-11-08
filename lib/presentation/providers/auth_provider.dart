@@ -75,27 +75,16 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
 
   Future<void> logout([String? errorMessage]) async{
 
-  state = state.copyWith(
-    authStatus: AuthStatus.notAuthenticated,
-    user: null,
-    errorMessage: errorMessage,
-  );
-
-
-
-}
-
-
-
-
-
-    
-    
+    state = state.copyWith(
+      authStatus: AuthStatus.notAuthenticated,
+      user: null,
+      errorMessage: errorMessage,
+    );
 
   }
+
+}
   
-
-
 
 enum AuthStatus{ checking, authenticated, notAuthenticated}
 

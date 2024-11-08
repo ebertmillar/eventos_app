@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextFormField extends StatelessWidget {
 
@@ -9,7 +10,9 @@ class CustomTextFormField extends StatelessWidget {
   final Color borderColor;
   final String? errorMessage;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final Function(String)? onChanged;
+  final TextEditingController? controller;
 
 
   const CustomTextFormField({
@@ -19,7 +22,9 @@ class CustomTextFormField extends StatelessWidget {
     this.borderColor = Colors.black,
     this.errorMessage,
     this.keyboardType = TextInputType.text ,
-    this.onChanged, 
+    this.onChanged,
+    this.inputFormatters, 
+    this.controller
   });
   
   @override
@@ -36,6 +41,8 @@ class CustomTextFormField extends StatelessWidget {
         children: [
           TextFormField(
             onChanged: onChanged,
+            controller: controller,
+            inputFormatters: inputFormatters, 
             textAlignVertical: TextAlignVertical.bottom,
             decoration: InputDecoration(
               hintText: hint,

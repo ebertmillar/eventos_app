@@ -1,9 +1,11 @@
 //! state provider
 
 import 'package:eventos_app/presentation/providers/auth_provider.dart';
-import 'package:eventos_app/presentation/shared/infrastucture/inputs/email.dart';
+import 'package:eventos_app/presentation/shared/infrastucture/inputs/phone.dart';
+import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 final registerFormProvider = StateNotifierProvider.autoDispose<RegisterFormNotifier,RegisterFormState>((ref) {
 
@@ -22,27 +24,44 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
   }): super(RegisterFormState());
 
   void onFullNameChanged(String value) {
-    state = state.copyWith(fullName: value);
+    final newFullName = FullName.dirty(value: value);
+    state = state.copyWith(
+      fullName: newFullName,
+      isValid: Formz.validate([newFullName, state.companyName, state.nif, state.email])
+    );
   }
 
   void onCompanyNameChanged(String value) {
-    state = state.copyWith(companyName: value);
+    final newCompanyName = CompanyName.dirty(value: value);
+    state = state.copyWith(
+      companyName: newCompanyName,
+      isValid: Formz.validate([newCompanyName, state.fullName, state.nif, state.email])
+    );
   }
 
   void onNifChanged(String value) {
-    state = state.copyWith(nif: value);
+    final newNif = NifNie.dirty(value: value);
+    state = state.copyWith(
+      nif: newNif,
+      isValid: Formz.validate([newNif, state.fullName, state.nif, state.email])
+    );
   }
 
   void onEmailChanged(String value) {
     final newEmail = Email.dirty(value: value);
     state = state.copyWith(
       email: newEmail,
-      isValid: Formz.validate([newEmail]),
+      isValid: Formz.validate([newEmail, state.fullName, state.companyName, state.nif]),
     );
   }
 
   void onTelefonoChanged(String value) {
-    state = state.copyWith(telefono: value);
+    //state = state.copyWith(telefono: value);
+    final newTelefono = Phone.dirty(value: value);
+    state = state.copyWith(
+      telefono: newTelefono,
+      isValid: Formz.validate([newTelefono, state.fullName, state.companyName, state.nif, state.email])
+    );
   }
 
   void onSectorChanged(String value) {
@@ -65,11 +84,11 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
     if(!state.isValid) return;
 
     await registerUserCallback(
-    state.fullName, 
-    state.companyName, 
-    state.nif, 
+    state.fullName.value, 
+    state.companyName.value, 
+    state.nif.value, 
     state.email.value, 
-    state.telefono, 
+    state.telefono.value,
     state.sector, 
     state.aceptaTerminos, 
     state.aceptaComunicaciones ?? false
@@ -82,10 +101,10 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
 
   _touchEveryField() {
     final email = Email.dirty(value: state.email.value);
-    final fullName = state.fullName.isNotEmpty ? state.fullName : 'El campo es requerido';
-    final companyName = state.companyName.isNotEmpty ? state.companyName : 'El campo es requerido';
-    final nif = state.nif.isNotEmpty ? state.nif : 'El campo es requerido';
-    final telefono = state.telefono.isNotEmpty ? state.telefono : 'El campo es requerido';
+    final fullName = FullName.dirty(value: state.fullName.value);
+    final companyName = CompanyName.dirty(value: state.companyName.value);
+    final nif = NifNie.dirty(value: state.nif.value);
+    final telefono = Phone.dirty(value: state.telefono.value);
     final sector = state.sector.isNotEmpty ? state.sector : 'El campo es requerido';
 
     final aceptaTerminos = state.aceptaTerminos;
@@ -102,7 +121,7 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
       sector: sector,
       aceptaTerminos: aceptaTerminos,
       aceptaComunicaciones: aceptaComunicaciones,
-      isValid: Formz.validate([email]),
+      isValid: Formz.validate([email , nif]),
     );
   }
   
@@ -113,11 +132,11 @@ class RegisterFormState{
   final bool isPosting;
   final bool isFormPosted;
   final bool isValid;
-  final String fullName;
-  final String companyName;
-  final String nif;
+  final FullName fullName;
+  final CompanyName companyName;
+  final NifNie nif;
   final Email email;
-  final String telefono;
+  final Phone telefono;
   final String sector;
   final bool aceptaTerminos;
   final bool? aceptaComunicaciones;
@@ -126,11 +145,11 @@ class RegisterFormState{
     this.isPosting = false, 
     this.isFormPosted= false, 
     this.isValid = false, 
-    this.fullName = '', 
-    this.companyName = '', 
-    this.nif ='', 
+    this.fullName = const FullName.pure(), 
+    this.companyName = const CompanyName.pure(), 
+    this.nif = const NifNie.pure(), 
     this.email = const Email.pure(), 
-    this.telefono ='' , 
+    this.telefono = const Phone.pure() , 
     this.sector ='', 
     this.aceptaTerminos = false, 
     this.aceptaComunicaciones = false
@@ -140,11 +159,11 @@ class RegisterFormState{
     bool? isPosting,
     bool? isFormPosted,
     bool? isValid,
-    String? fullName,
-    String? companyName,
-    String? nif,
+    FullName? fullName,
+    CompanyName? companyName,
+    NifNie? nif,
     Email? email,
-    String? telefono,
+    Phone? telefono,
     String? sector,
     bool? aceptaTerminos,
     bool? aceptaComunicaciones,

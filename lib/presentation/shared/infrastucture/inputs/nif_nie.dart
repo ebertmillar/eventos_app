@@ -19,7 +19,7 @@ class NifNie extends FormzInput<String, NifNieError> {
   String? get errorMessage {
     if (isValid || isPure) return null;
 
-    if (displayError == NifNieError.empty) return 'El campo es requerido';
+    if (displayError == NifNieError.empty) return 'El NIF/NIE es requerido';
     if (displayError == NifNieError.format) {
       // Detecta si es NIF o NIE según el primer carácter
       if (value.startsWith(RegExp(r'[XYZ]'))) {

@@ -80,21 +80,24 @@ class _RegisterForm extends ConsumerWidget {
             label: 'Nombre completo', 
             hint: 'Tu nombre completo',
             keyboardType: TextInputType.text,
-            onChanged: ref.read(registerFormProvider.notifier).onFullNameChanged,         
+            onChanged: ref.read(registerFormProvider.notifier).onFullNameChanged,
+            errorMessage: registerForm.isFormPosted ? registerForm.fullName.errorMessage : null,             
           ),
                     
           CustomTextFormField(
             label: 'Nombre de la empresa', 
             hint: 'El nombre de la empresa',
             keyboardType: TextInputType.text,
-            onChanged: ref.read(registerFormProvider.notifier).onCompanyNameChanged,             
+            onChanged: ref.read(registerFormProvider.notifier).onCompanyNameChanged,    
+            errorMessage: registerForm.isFormPosted ? registerForm.companyName.errorMessage : null,             
           ),
           
           CustomTextFormField(
             label: 'NIF/NIE', 
             hint: 'Tu NIE o NIF de la empresa',
             keyboardType: TextInputType.text,
-            onChanged: ref.read(registerFormProvider.notifier).onNifChanged,    
+            onChanged: ref.read(registerFormProvider.notifier).onNifChanged,
+            errorMessage: registerForm.isFormPosted ? registerForm.nif.errorMessage : null,    
           ),
           
           CustomTextFormField(
@@ -135,6 +138,7 @@ class _RegisterForm extends ConsumerWidget {
                 
                 child: CustomTextFormField(
                   onChanged: ref.read(registerFormProvider.notifier).onTelefonoChanged,
+                  keyboardType: TextInputType.number,
                   label: 'Teléfono', 
                   hint: '555 555 555'
                 ),

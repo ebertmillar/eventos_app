@@ -1,8 +1,10 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:eventos_app/presentation/providers/register_form_provider.dart';
 import 'package:eventos_app/presentation/shared/widgets/custom_checkbox.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class RegisterUserScreen extends StatelessWidget {
   const RegisterUserScreen({super.key});
@@ -59,6 +61,7 @@ class _RegisterForm extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final registerForm = ref.watch(registerFormProvider);
+    // Agrega una variable para almacenar el prefijo seleccionado
 
   String? selectedSector;
     
@@ -107,25 +110,43 @@ class _RegisterForm extends ConsumerWidget {
             onChanged: (value) => ref.read(registerFormProvider.notifier).onEmailChanged(value),
             errorMessage: registerForm.isFormPosted ? registerForm.email.errorMessage : null,
           ),
+
+          // CustomFormFieldNumber(
+          //   initialValue: PhoneNumber(isoCode: 'ES', dialCode: '+34'),
+          //   label: 'numero'),
           
-          //Numero de telefono y prefijo
+          // //Numero de telefono y prefijo
           Row(
             children: [
               Expanded(
                 flex: 1,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     height: 56,
-                    child: const Row(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.flag, size: 18),
-                        SizedBox(width: 5),
-                        Text('+34', style: TextStyle(fontSize: 14)), // Country code example
+                          
+                          CountryCodePicker(
+                            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
+                            initialSelection: 'ES',
+                            textOverflow: TextOverflow.visible,
+                            flagWidth: 23,
+                            closeIcon: Icon(Icons.close, size: 24),
+                            margin: EdgeInsets.only(right: 4, left: 0),
+                            onChanged: (country) {
+                              //ref.read(registerFormProvider.notifier).onPrefixChanged(country.toString());
+                              ref.read(registerFormProvider.notifier).onPrefixChanged(country);
+                            },
+                            
+                          ),
+                          Icon(Icons.arrow_drop_down, size: 20,)
+                        
                       ],
                     ),
                 ),
@@ -137,10 +158,11 @@ class _RegisterForm extends ConsumerWidget {
                 flex: 2,
                 
                 child: CustomTextFormField(
-                  onChanged: ref.read(registerFormProvider.notifier).onTelefonoChanged,
-                  keyboardType: TextInputType.number,
+                  onChanged: (value) => ref.read(registerFormProvider.notifier).onTelefonoChanged(value),
+                  keyboardType: TextInputType.phone,
                   label: 'Teléfono', 
-                  hint: '555 555 555'
+                  hint: '555 555 555',
+                  errorMessage: registerForm.isFormPosted ? registerForm.telefono.errorMessage : null,
                 ),
                
               ),              
@@ -157,7 +179,8 @@ class _RegisterForm extends ConsumerWidget {
             onChanged: (String? newValue) {
               ref.read(registerFormProvider.notifier).onSectorChanged(newValue ?? '');
             },
-                  ),
+            errorMessage: registerForm.isFormPosted ? registerForm.sector.errorMessage : null,
+          ),
                   
           const SizedBox(height: 5),
 
@@ -181,7 +204,7 @@ class _RegisterForm extends ConsumerWidget {
 
           CustomFilledButton(
             onPressed: (){
-              ref.read(registerFormProvider.notifier).onFormSubmit();
+              ref.read(registerFormProvider.notifier).onFormSubmit(context);
 
             },
                 

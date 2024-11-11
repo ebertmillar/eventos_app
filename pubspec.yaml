@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   cloud_functions: ^5.1.4
+  country_code_picker: ^3.1.0
+  country_picker: ^2.0.26
   dio: ^5.7.0
   flutter:
     sdk: flutter

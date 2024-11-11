@@ -1,5 +1,4 @@
 import 'package:formz/formz.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 // Define input validation errors
 enum PhoneError { empty, format }
@@ -7,13 +6,7 @@ enum PhoneError { empty, format }
 // Extend FormzInput and provide the input type and error type.
 class Phone extends FormzInput<String, PhoneError> {
   static final RegExp phoneRegExp = RegExp(
-    r'^\+?([0-9]{1,4})?([0-9]{10,15})$', // Expresión regular para formato de teléfono
-  );
-
-  // Usamos MaskTextInputFormatter para aplicar el formato
-  static final maskFormatter = MaskTextInputFormatter(
-    mask: '### ### ###',
-    filter: {"#": RegExp(r'[0-9]')},
+    r'^\+?\d{1,4}?[.\-\s]?\(?\d{1,4}?\)?[.\-\s]?\d{1,4}[.\-\s]?\d{1,4}$',
   );
 
   // Call super.pure to represent an unmodified form input.
@@ -25,9 +18,9 @@ class Phone extends FormzInput<String, PhoneError> {
   String? get errorMessage {
     if (isValid || isPure) return null;
 
-    if (displayError == PhoneError.empty) return 'El teléfono es requerido';
+    if (displayError == PhoneError.empty) return 'El número de teléfono es requerido';
     if (displayError == PhoneError.format) {
-      return 'Número de teléfono no válido';
+      return 'El formato del número de teléfono es incorrecto';
     }
 
     return null;
@@ -36,17 +29,9 @@ class Phone extends FormzInput<String, PhoneError> {
   // Override validator to handle validating a given input value.
   @override
   PhoneError? validator(String value) {
-    // Primero formateamos el número con la máscara
-    final formattedValue = maskFormatter.getMaskedText();
-    
-    if (formattedValue.isEmpty) return PhoneError.empty;
-    if (!phoneRegExp.hasMatch(formattedValue)) return PhoneError.format;
+    if (value.isEmpty || value.trim().isEmpty) return PhoneError.empty;
+    if (!phoneRegExp.hasMatch(value)) return PhoneError.format;
 
     return null;
-  }
-
-  // Método para obtener el número formateado
-  String get formattedPhoneNumber {
-    return maskFormatter.getMaskedText();
   }
 }

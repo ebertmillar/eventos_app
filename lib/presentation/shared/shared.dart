@@ -10,3 +10,6 @@ export 'infrastucture/inputs/company_name.dart';
 export 'infrastucture/inputs/nif_nie.dart';
 export 'infrastucture/inputs/email.dart';
 export 'infrastucture/inputs/phone.dart';
+
+export 'infrastucture/services/key_value_storage.dart';
+export 'infrastucture/services/key_value_storage_impl.dart';

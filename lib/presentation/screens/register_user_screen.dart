@@ -1,4 +1,5 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:eventos_app/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/presentation/providers/register_form_provider.dart';
 import 'package:eventos_app/presentation/shared/widgets/custom_checkbox.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
@@ -50,29 +51,35 @@ class RegisterUserScreen extends StatelessWidget {
     
     );
   }
-  
- 
-
 }
+
 
 class _RegisterForm extends ConsumerWidget {
   const _RegisterForm();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final registerForm = ref.watch(registerFormProvider);
-    // Agrega una variable para almacenar el prefijo seleccionado
 
-  String? selectedSector;
-    
-    final List<String> sectorOptions = [
-      'Tecnología',
-      'Educación',
-      'Salud',
-      'Finanzas',
-      'Comercio',
-      'Manufactura',
-    ];      
+    final registerForm = ref.watch(registerFormProvider);
+
+    ref.listen(authProvider, (previous, next){
+
+      if(next.errorMessage.isEmpty) return;
+
+      showSnackbar( context, next.errorMessage);
+
+    });
+
+    String? selectedSector;
+      
+      final List<String> sectorOptions = [
+        'Tecnología',
+        'Educación',
+        'Salud',
+        'Finanzas',
+        'Comercio',
+        'Manufactura',
+      ];      
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -111,11 +118,6 @@ class _RegisterForm extends ConsumerWidget {
             errorMessage: registerForm.isFormPosted ? registerForm.email.errorMessage : null,
           ),
 
-          // CustomFormFieldNumber(
-          //   initialValue: PhoneNumber(isoCode: 'ES', dialCode: '+34'),
-          //   label: 'numero'),
-          
-          // //Numero de telefono y prefijo
           Row(
             children: [
               Expanded(
@@ -134,18 +136,18 @@ class _RegisterForm extends ConsumerWidget {
                           
                           CountryCodePicker(
                             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
+                            
                             initialSelection: 'ES',
                             textOverflow: TextOverflow.visible,
                             flagWidth: 23,
-                            closeIcon: Icon(Icons.close, size: 24),
-                            margin: EdgeInsets.only(right: 4, left: 0),
+                            closeIcon: const Icon(Icons.close, size: 2),
+                            margin: const EdgeInsets.only(right: 4, left: 0),
                             onChanged: (country) {
-                              //ref.read(registerFormProvider.notifier).onPrefixChanged(country.toString());
                               ref.read(registerFormProvider.notifier).onPrefixChanged(country);
                             },
                             
                           ),
-                          Icon(Icons.arrow_drop_down, size: 20,)
+                          const Icon(Icons.arrow_drop_down, size: 20,)
                         
                       ],
                     ),
@@ -169,11 +171,9 @@ class _RegisterForm extends ConsumerWidget {
             ],
           ),
 
-                    
-          // Sector Field (Custom Dropdown)
           CustomDropdownFormField(
             label: 'Sector',
-            hint: 'Introduce el sector al que te dedicas',
+            hint: 'Selecciona el sector al que te dedicas',
             items: sectorOptions,
             selectedValue: selectedSector,
             onChanged: (String? newValue) {
@@ -191,7 +191,7 @@ class _RegisterForm extends ConsumerWidget {
               ref.read(registerFormProvider.notifier).onAceptaTerminosChanged(newValue ?? false);
             },
           ),
-          // Usando CustomCheckBox para "Acepto condiciones comerciales"
+
           CustomCheckBox(
             label: 'Acepto condiciones comerciales',
             value: ref.watch(registerFormProvider).aceptaComunicaciones ?? false,
@@ -220,4 +220,13 @@ class _RegisterForm extends ConsumerWidget {
     
     );
   }
+  
+  void showSnackbar(BuildContext context, String errorMessage) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)
+      )
+    );
+  }
+  
 }

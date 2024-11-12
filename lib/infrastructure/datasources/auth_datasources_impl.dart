@@ -49,10 +49,16 @@ class AuthDatasourcesImpl extends AuthDatasource {
     } on DioException catch (e) {
       // Manejo de errores HTTP específicos
       if (e.response != null) {
+        if (e.response?.statusCode == 409) {
+          throw EmailAlreadyExists(e.response?.data['message'] ?? EmailAlreadyExists());
+        }
         if (e.response?.statusCode == 400) {
-          throw CustomError(e.response?.data['message'] ?? 'Error al registrar');
+          throw CustomError(e.response?.data['message'] ?? BadRequest());
         } else if (e.response?.statusCode == 401) {
           throw WrongCredentials();
+        }
+        if (e.response?.statusCode == 500) {
+          throw CustomError('Hubo un problema con el servidor. Por favor, intenta nuevamente más tarde');
         }
         throw CustomError('Error del servidor: ${e.response?.statusCode}');
       }

@@ -97,21 +97,24 @@ void onPrefixChanged(CountryCode country) {
 
     if(!state.isValid) return;
 
+    state = state.copyWith(isPosting: true);
+
+
     // Combina prefijo y teléfono
     final fullPhoneNumber = '${state.selectedPrefix}${state.telefono.value}';
 
     await registerUserCallback(
-    state.fullName.value, 
-    state.companyName.value, 
-    state.nif.value, 
-    state.email.value, 
-    fullPhoneNumber,
-    state.sector.value, 
-    state.aceptaTerminos, 
-    state.aceptaComunicaciones ?? false
-  );
+      state.fullName.value, 
+      state.companyName.value, 
+      state.nif.value, 
+      state.email.value, 
+      fullPhoneNumber,
+      state.sector.value, 
+      state.aceptaTerminos, 
+      state.aceptaComunicaciones ?? false
+    );
 
-    print(state);
+    state = state.copyWith(isPosting: false);
 
 
   }

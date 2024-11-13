@@ -1,12 +1,14 @@
 
+import 'package:eventos_app/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final textTheme = Theme.of(context).textTheme;
 
@@ -150,6 +152,8 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+
+                        
         
                         const SizedBox(height: 40),
                       ],
@@ -166,6 +170,9 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+
+      
+       
 
       bottomNavigationBar: const CustomNavigationbar()
     );

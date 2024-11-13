@@ -1,5 +1,4 @@
 
-import 'package:eventos_app/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -152,8 +151,6 @@ class HomeScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
-
-                        
         
                         const SizedBox(height: 40),
                       ],

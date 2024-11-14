@@ -20,8 +20,8 @@ class AuthDatasourcesImpl extends AuthDatasource {
           }
         )
       );
-
-      final user = UserMapper.userJsonToEntity(response.data);
+      print('Respuesta del servidor: ${response.data}');
+      final user = UserMapper.userJsonToEntityCheckStatus(response.data);
       return user;
       
     } on DioException catch (e) {

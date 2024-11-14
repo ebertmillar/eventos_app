@@ -2,6 +2,7 @@
 import 'package:eventos_app/domain/domain.dart';
 import 'package:eventos_app/infrastructure/infrastructure.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
@@ -70,28 +71,50 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
 
 
   void checkAuthStatus() async {
-    final token  = await keyValueStorage.getValue('token');
+    final token = await keyValueStorage.getValue<String>('token');
+    print('Token recuperado en checkAuthStatus: $token');
 
-    if(token == null) return logout();
+    if (token == null || token.isEmpty) {
+      print('Token no encontrado o es inválido. Desconectando.');
+      return logout();
+    }
 
     try {
       final user = await authRepository.checkAuthStatus(token);
       _setLoggedUser(user);
-      
     } catch (e) {
-      
+      print('Error de autenticación: $e');
+      logout();
     }
   }
 
+
   void _setLoggedUser (User user) async {
-    //guardar token fisicamente
-    await keyValueStorage.setKeyValue('token', user.token);
+
+    // Obtener idToken a partir del customToken y guardarlo en el almacenamiento
+    final idToken = await FirebaseAuth.instance.currentUser?.getIdToken() ?? '';
+    await keyValueStorage.setKeyValue('token', idToken);
+
+    // Usa el idToken directamente y guárdalo en SharedPreferences
+  
+  await keyValueStorage.setKeyValue('token', idToken);
+
 
     state = state.copyWith(
     user: user,
     authStatus: AuthStatus.authenticated,
     errorMessage: '',
     );
+  }
+
+  Future<String> getIdToken(String customToken) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      String idToken = await userCredential.user?.getIdToken() ?? '';
+      return idToken;
+    } catch (e) {
+      throw CustomError('Error al obtener el idToken: $e');
+    }
   }
 
   Future<void> logout([String? errorMessage]) async{

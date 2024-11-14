@@ -12,8 +12,10 @@ class AuthRepositoryImpl  extends AuthRepository{
   }) : dataSource = dataSource ?? AuthDatasourcesImpl();
 
   @override
-  Future<User> checkAuthStatus(String token) {
-    return dataSource.checkAuthStatus(token);
+  Future<User> checkAuthStatus(String token) async {
+    if (token.isEmpty) throw CustomError('Token vacío o inválido');
+
+    return await dataSource.checkAuthStatus(token);
   }
 
   @override

@@ -185,6 +185,7 @@ class _RegisterForm extends ConsumerWidget {
           const SizedBox(height: 5),
 
           CustomCheckBox(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 50),
             label: 'Acepto los términos y condiciones',
             value: ref.watch(registerFormProvider).aceptaTerminos,
             onChanged: (newValue) {
@@ -194,6 +195,7 @@ class _RegisterForm extends ConsumerWidget {
 
           CustomCheckBox(
             label: 'Acepto condiciones comerciales',
+            contentPadding: const EdgeInsets.symmetric(horizontal: 50),
             value: ref.watch(registerFormProvider).aceptaComunicaciones ?? false,
             onChanged: (newValue) {
               ref.read(registerFormProvider.notifier).onAceptaComunicacionesChanged(newValue ?? false);

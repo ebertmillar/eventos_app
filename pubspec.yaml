@@ -11,6 +11,7 @@ dependencies:
   country_code_picker: ^3.1.0
   country_picker: ^2.0.26
   dio: ^5.7.0
+  easy_stepper: ^0.8.5+1
   firebase_auth: ^5.3.3
   firebase_core: ^3.8.0
   flutter:

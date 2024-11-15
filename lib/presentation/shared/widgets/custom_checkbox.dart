@@ -3,19 +3,21 @@ import 'package:flutter/material.dart';
 class CustomCheckBox extends StatelessWidget {
   final String label;
   final bool value;
+  final EdgeInsetsGeometry? contentPadding;
   final Function(bool?)? onChanged;
 
   const CustomCheckBox({
     super.key,
     required this.label,
     required this.value,
-    this.onChanged,
+    this.contentPadding,
+    this.onChanged, 
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 50),
+      contentPadding: contentPadding,
       visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,

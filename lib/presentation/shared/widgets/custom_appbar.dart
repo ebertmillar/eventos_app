@@ -6,14 +6,14 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget  {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Padding(
-        padding: EdgeInsets.all(8.0),
+      title: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
             Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(
+                  const TextSpan(
                     text: 'Evento ',
                     style: TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold),
@@ -21,7 +21,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget  {
                   TextSpan(
                     text: 'Fácil',
                     style: TextStyle(
-                        color: Colors.amber, fontWeight: FontWeight.bold),
+                        color: Colors.orange[400], fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

@@ -13,18 +13,23 @@ class CustomTextFormField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Function(String)? onChanged;
   final TextEditingController? controller;
+  final int? maxLines;
+  final Widget? suffixIcon;
 
 
   const CustomTextFormField({
     super.key, 
     required this.label,
     this.hint,
-    this.borderColor = Colors.black,
+    this.borderColor = Colors.black45,
     this.errorMessage,
     this.keyboardType = TextInputType.text ,
     this.onChanged,
     this.inputFormatters, 
-    this.controller
+    this.controller,
+    this.maxLines = 1, 
+    this.suffixIcon,
+    
   });
   
   @override
@@ -39,7 +44,8 @@ class CustomTextFormField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Stack(
         children: [
-          TextFormField(
+          TextFormField(           
+            maxLines: maxLines,
             onChanged: onChanged,
             controller: controller,
             inputFormatters: inputFormatters, 
@@ -49,6 +55,7 @@ class CustomTextFormField extends StatelessWidget {
               hintStyle: TextStyle(fontSize: 14, 
               color: errorMessage != null ? Colors.red.shade800 : Colors.black54,), 
               isDense: true,
+              suffixIcon: suffixIcon,
               errorText: errorMessage,
               contentPadding: const EdgeInsets.only(top: 30, left: 10, bottom: 5),
               enabledBorder: outlineInputBorder,
@@ -74,6 +81,96 @@ class CustomTextFormField extends StatelessWidget {
                 color: errorMessage != null ? Colors.red.shade800 : Colors.black87,), // Estilo del label
             ),
           ),          
+        ],
+      ),
+    );
+  }
+}
+
+class CustomAttachmentField extends StatefulWidget {
+  final String label;
+  final String buttonText;
+  final VoidCallback onAttachmentAdded;
+
+  const CustomAttachmentField({
+    Key? key,
+    required this.label,
+    required this.buttonText,
+    required this.onAttachmentAdded,
+  }) : super(key: key);
+
+  @override
+  _CustomAttachmentFieldState createState() => _CustomAttachmentFieldState();
+}
+
+class _CustomAttachmentFieldState extends State<CustomAttachmentField> {
+  String? attachmentName;
+
+  void _selectAttachment() {
+    // Aquí podrías abrir el selector de archivos y obtener el nombre del archivo seleccionado.
+    // Para propósitos de ejemplo, simularemos que se ha seleccionado un archivo.
+    setState(() {
+      attachmentName = "cartelera_evento.pdf"; // Reemplaza con el nombre del archivo seleccionado.
+    });
+
+    // Llama al callback si necesitas ejecutar una acción al adjuntar el archivo
+    widget.onAttachmentAdded();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black45),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Muestra el nombre del archivo adjunto o el hint
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.grey[200],
+            ),
+            child: Text(
+              attachmentName ?? 'Adjunta cartelería, folletos, etc.',
+              style: TextStyle(
+                fontSize: 14,
+                color: attachmentName != null ? Colors.black87 : Colors.black54,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Botón para añadir documentos
+          Center(
+            child: ElevatedButton(
+              onPressed: _selectAttachment,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black87,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: Text(
+                widget.buttonText,
+                style: const TextStyle(color: Colors.amberAccent),
+              ),
+            ),
+          ),
         ],
       ),
     );

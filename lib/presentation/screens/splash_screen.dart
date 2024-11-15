@@ -23,9 +23,9 @@ class SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +36,7 @@ class SplashScreenState extends State<SplashScreen> {
                   Text.rich(
                     TextSpan(
                       children: [
-                        TextSpan(
+                        const TextSpan(
                           text: 'Evento ',
                           style: TextStyle(
                               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 40),
@@ -44,7 +44,7 @@ class SplashScreenState extends State<SplashScreen> {
                         TextSpan(
                           text: 'Fácil',
                           style: TextStyle(
-                              color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 40),
+                              color: Colors.orange[400], fontWeight: FontWeight.bold, fontSize: 40),
                         ),
                       ],
                     ),
@@ -52,7 +52,7 @@ class SplashScreenState extends State<SplashScreen> {
                 ],
               ),
         
-              Center(
+              const Center(
                 
                 child: Text('La manera más sencilla de crear y organizar tus eventos', 
                   style:TextStyle(fontSize: 18),

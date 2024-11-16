@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:eventos_app/helpers/date_time_formatters.dart';
-import 'package:eventos_app/helpers/form_date.dart';
+import 'package:eventos_app/helpers/date_picker_helper.dart';
+import 'package:eventos_app/helpers/time_picker_helper.dart';
 import 'package:eventos_app/presentation/providers/create_event_form_provider.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:eventos_app/presentation/shared/widgets/custom_checkbox.dart';
@@ -17,7 +17,7 @@ class DatosDelEventoForm extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final eventFormState = ref.watch(createEventFormProvider);
-    //final formNotifier = ref.read(createEventFormProvider.notifier);
+    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,8 +34,8 @@ class DatosDelEventoForm extends ConsumerWidget {
           label: 'Decripción del evento',
           hint: 'Nombre oficial del evento',
           keyboardType: TextInputType.text,
-          controller: ref.read(createEventFormProvider.notifier).nameController,
-          onChanged: (value) => ref.read(createEventFormProvider.notifier).onNameChanged(value),
+          controller: eventFormNotifier.nameController,
+          onChanged: (value) => eventFormNotifier.onNameChanged(value),
         ),
 
         CustomTextFormField(
@@ -43,8 +43,8 @@ class DatosDelEventoForm extends ConsumerWidget {
           hint: 'Breve explicacion del tema...',
           keyboardType: TextInputType.text,
           maxLines: 4,
-          controller: ref.read(createEventFormProvider.notifier).descriptionController,
-          onChanged: ref.read(createEventFormProvider.notifier).onDescriptionChanged,
+          controller: eventFormNotifier.descriptionController,
+          onChanged: eventFormNotifier.onDescriptionChanged,
         ),
         
         Row(
@@ -54,18 +54,17 @@ class DatosDelEventoForm extends ConsumerWidget {
                 label: 'Día de inicio',
                 hint: '12/12/2020',
                 keyboardType: TextInputType.text,
-                controller: TextEditingController(
-                  text: eventFormState.fechaInicio != null
-                      ? formatDate(eventFormState.fechaInicio!)
-                      : '',
-                ),
+                controller: eventFormNotifier.startDateController,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today, color: Colors.black45, size: 25),
                   onPressed: () async {
-                    final selectedDate = await _showDatePicker(context, eventFormState.fechaInicio);
-                    if (selectedDate != null) {
-                      ref.read(createEventFormProvider.notifier).onStartDateChanged(selectedDate);
-                    }
+                    final selectedDate = await showDatePickerHelper(
+                      context: context,
+                      initialDate: eventFormState.fechaInicio,
+                      helpText: 'Selecciona una fecha', // Puedes personalizar esto
+                    );
+                    selectedDate != null ? eventFormNotifier.onStartDateChanged(selectedDate) : null;
+                   
                   },
                 ),
               ),
@@ -74,20 +73,19 @@ class DatosDelEventoForm extends ConsumerWidget {
             Expanded(
               child: CustomTextFormField(
                 label: 'Día final',
-                hint: 'dd/mm/yyyy',
+                hint: '12/12/2020',
                 keyboardType: TextInputType.text,
-                controller: TextEditingController(
-                  text: eventFormState.fechaFin != null
-                      ? formatDate(eventFormState.fechaFin!)
-                      : '',
-                ),
+                controller: eventFormNotifier.endDateController,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today, color: Colors.black45, size: 25),
                   onPressed: () async {
-                    final selectedDate = await _showDatePicker(context, eventFormState.fechaFin);
-                    if (selectedDate != null) {
-                      ref.read(createEventFormProvider.notifier).onEndDateChanged(selectedDate);
-                    }
+                    final selectedDate = await showDatePickerHelper(
+                      context: context,
+                      initialDate: eventFormState.fechaFin,
+                      helpText: 'Selecciona una fecha', // Puedes personalizar esto
+                    ); 
+                    selectedDate != null ? eventFormNotifier.onEndDateChanged(selectedDate) : null;
+
                   },
                 ),
               ),
@@ -101,17 +99,17 @@ class DatosDelEventoForm extends ConsumerWidget {
                 label: 'Hora de incio',
                 hint: '12:00 PM',
                 keyboardType: TextInputType.text,
-                controller: TextEditingController(
-                  text: eventFormState.horaInicio != null
-                      ? formatTimeWithAMPM(eventFormState.horaInicio!)
-                      : '',
-                ),
+                controller: eventFormNotifier.startTimeController,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.access_time_outlined, color: Colors.black45, size: 25,),
                   onPressed: () async {
-                    final selectedTime = await _showTimePicker(context, eventFormState);
+                    final selectedTime = await showTimePickerHelper(
+                      context: context,
+                      initialTime: eventFormState.horaInicio, 
+                      helpText: 'Selecciona la hora', 
+                    );
                     if (selectedTime != null) {
-                      ref.read(createEventFormProvider.notifier).onStartTimeChanged(selectedTime);
+                      eventFormNotifier.onStartTimeChanged(selectedTime);
                     }                    
                   }
                 ),               
@@ -123,17 +121,17 @@ class DatosDelEventoForm extends ConsumerWidget {
                 label: 'Hora final',
                 hint: '12:00 PM',
                 keyboardType: TextInputType.text,
-                controller: TextEditingController(
-                  text: eventFormState.horaFin != null
-                      ? formatTimeWithAMPM(eventFormState.horaFin!)
-                      : '',
-                ),
+                controller: eventFormNotifier.endTimeController,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.access_time_outlined, color: Colors.black45, size: 25,),
                   onPressed: () async {
-                    final selectedTime = await _showTimePicker(context, eventFormState);
+                    final selectedTime = await showTimePickerHelper(
+                      context: context,
+                      initialTime: eventFormState.horaFin, 
+                      helpText: 'Selecciona la hora', 
+                    );
                     if (selectedTime != null) {
-                      ref.read(createEventFormProvider.notifier).onEndTimeChanged(selectedTime);
+                      eventFormNotifier.onEndTimeChanged(selectedTime);
                     }                    
                   }
                 ),               
@@ -147,15 +145,15 @@ class DatosDelEventoForm extends ConsumerWidget {
           value: eventFormState.horariosDiferentesPorDia ?? false,
           contentPadding: const EdgeInsets.symmetric(horizontal: 15),
           onChanged: (newValue) {
-              ref.read(createEventFormProvider.notifier).onDifferentTimePerDayChanged(newValue ?? false);
+              eventFormNotifier.onDifferentTimePerDayChanged(newValue ?? false);
             },
         ),
 
         CustomTextFormField(
           label: 'Ubicación',
           hint: 'Dirección física o virtual(link de la reunión)',
-          controller: ref.read(createEventFormProvider.notifier).locationController,
-          onChanged: ref.read(createEventFormProvider.notifier).onLocationChanged,
+          controller: eventFormNotifier.locationController,
+          onChanged: eventFormNotifier.onLocationChanged,
         ),
 
         CustomImagePickerField(
@@ -169,7 +167,7 @@ class DatosDelEventoForm extends ConsumerWidget {
               final pickedFile = await picker.pickImage(source: ImageSource.gallery);
               if (pickedFile != null) {
                 final imageFile = File(pickedFile.path);
-                ref.read(createEventFormProvider.notifier).onImageChanged(imageFile);
+                eventFormNotifier.onImageChanged(imageFile);
               }
             },
           ),
@@ -179,28 +177,5 @@ class DatosDelEventoForm extends ConsumerWidget {
     );
   }
 
-  Future<DateTime?> _showDatePicker(BuildContext context, DateTime? initialDate) {
-    return showDatePicker(
-      context: context,
-      initialDate: initialDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-  }
 
-
-
-  Future<TimeOfDay?> _showTimePicker(BuildContext context, EventFormState eventFormState) {
-    return showTimePicker(
-      context: context,
-      initialEntryMode: TimePickerEntryMode.input,
-      helpText: 'Introduce la hora',
-      initialTime: eventFormState.horaInicio != null
-        ? TimeOfDay(
-            hour: eventFormState.horaInicio!.hour,
-            minute: eventFormState.horaInicio!.minute,
-          )
-        : TimeOfDay.now(),
-    );
-  }
 }

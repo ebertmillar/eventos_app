@@ -46,7 +46,8 @@ final goRouterProvider = Provider((ref) {
       if( isGoingTo == '/create-event' && authStatus == AuthStatus.checking) return '/register';
 
       if (authStatus == AuthStatus.notAuthenticated) {
-        if (isGoingTo == '/create-event' || isGoingTo == '/checking') return '/';
+        if (isGoingTo == '/checking') return '/';
+        if (isGoingTo == '/create-event' ) return '/register';
       }
 
       if( authStatus == AuthStatus.authenticated){

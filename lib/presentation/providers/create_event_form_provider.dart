@@ -3,17 +3,101 @@ import 'dart:io';
 
 import 'package:eventos_app/domain/entities/event.dart';
 import 'package:eventos_app/domain/enum/payment_method.dart';
+import 'package:eventos_app/helpers/date_time_formatters.dart';
+import 'package:eventos_app/helpers/form_date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 
 final createEventFormProvider = 
-  StateNotifierProvider.autoDispose<CreateEventFormNotifier, EventFormState>((ref) {
+  StateNotifierProvider<CreateEventFormNotifier, EventFormState>((ref) {
     return CreateEventFormNotifier();
 });
 
+
 class CreateEventFormNotifier extends StateNotifier<EventFormState>{
-  CreateEventFormNotifier() : super(EventFormState());
+  CreateEventFormNotifier() : super(EventFormState()){
+
+    startDateController.addListener(() {
+      final text = startDateController.text.trim();
+      try {
+        final date = DateFormat('dd/MM/yyyy').parse(text);
+        state = state.copyWith(fechaInicio: date);
+      } catch (e) {
+        debugPrint('Error al analizar la fecha: $text');
+      }
+    });
+
+    endDateController.addListener(() {
+      final text = endDateController.text.trim();
+        try {
+          final date = DateFormat('dd/MM/yyyy').parse(text);
+          state = state.copyWith(fechaFin: date); 
+        } catch (e) {
+          debugPrint('Error al analizar la fecha: $text');
+        }
+    });
+
+    inscriptionStartDateController.addListener(() {
+      final text = inscriptionStartDateController.text.trim();
+      try {
+        final date = DateFormat('dd/MM/yyyy').parse(text);
+        state = state.copyWith(fechaInicioInscripcion: date);
+      } catch (e) {
+        debugPrint('Error al analizar la fecha: $text');
+      }
+    });
+
+    inscriptionEndDateController.addListener(() {
+      final text = inscriptionEndDateController.text.trim();
+        try {
+          final date = DateFormat('dd/MM/yyyy').parse(text);
+          state = state.copyWith(fechaFinInscripcion: date); 
+        } catch (e) {
+          debugPrint('Error al analizar la fecha: $text');
+        }
+    });
+
+    startTimeController.addListener(() {
+      final text = startTimeController.text.trim();
+      final time = parseTimeWithAMPM(text);
+       if(time != null){
+         state = state.copyWith(horaInicio: time);
+       }      
+    });
+  
+    endTimeController.addListener(() {
+      final text = endTimeController.text.trim();
+      final time = parseTimeWithAMPM(text); // Convierte el texto ingresado a TimeOfDay
+      if (time != null) {
+        state = state.copyWith(horaFin: time);
+      }
+    });
+
+    inscriptionStartDateController.addListener(() {
+      final text = inscriptionStartDateController.text.trim();
+      try {
+        final date = DateFormat('dd/MM/yyyy').parse(text);
+        state = state.copyWith(fechaInicioInscripcion: date);
+      } catch (e) {
+        debugPrint('Error al analizar la fecha de inicio de inscripción: $text');
+      }
+    });
+
+    inscriptionEndDateController.addListener(() {
+      final text = inscriptionEndDateController.text.trim();
+      try {
+        final date = DateFormat('dd/MM/yyyy').parse(text);
+        state = state.copyWith(fechaFinInscripcion: date);
+      } catch (e) {
+        debugPrint('Error al analizar la fecha de fin de inscripción: $text');
+      }
+    });
+
+  }
+  
+ 
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -23,6 +107,12 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
   final TextEditingController endTimeController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController headerImageController = TextEditingController();
+  final TextEditingController inscriptionStartDateController = TextEditingController();
+  final TextEditingController inscriptionEndDateController = TextEditingController();
+  final TextEditingController inscriptionStartTimeController = TextEditingController();
+  final TextEditingController inscriptionEndTimeController = TextEditingController();
+  final TextEditingController eventCapacityController = TextEditingController();
+  final TextEditingController eventCostController = TextEditingController();
 
   void onNameChanged(String name) {
     state = state.copyWith(name: name);
@@ -35,22 +125,23 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
   }
   
   void onStartDateChanged(DateTime date) {
-    state = state.copyWith(fechaInicio: date);
-    startDateController.text = "${date.day}/${date.month}/${date.year}";
+    state = state.copyWith(fechaInicio: date); 
+    startDateController.text = formatDate(date); 
   }
 
   void onEndDateChanged(DateTime date) {
     state = state.copyWith(fechaFin: date);
-    endDateController.text = "${date.day}/${date.month}/${date.year}";
+    endDateController.text = formatDate(date); 
   }
 
-  void onStartTimeChanged(TimeOfDay value) {
-    state = state.copyWith(horaInicio: value);
-    print(state.horaInicio);
+  void onStartTimeChanged(TimeOfDay time) {
+    state = state.copyWith(horaInicio: time);
+    startTimeController.text = formatTimeWithAMPM(time); 
   }
 
-  void onEndTimeChanged(TimeOfDay value) {
-    state = state.copyWith(horaFin: value);
+  void onEndTimeChanged(TimeOfDay time) {
+    state = state.copyWith(horaFin: time);
+    endTimeController.text = formatTimeWithAMPM(time); // Formatea y actualiza el texto del controlador
   }
 
   void onImageChanged(File newImage) {
@@ -69,20 +160,24 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
     state = state.copyWith(horariosDiferentesPorDia: value);
   }
 
-  void onInscriptionStartDateChanged(DateTime value) {
-    state = state.copyWith(fechaInicioInscripcion: value);
+  void onInscriptionStartDateChanged(DateTime date) {
+    state = state.copyWith(fechaInicioInscripcion: date);
+    inscriptionStartDateController.text = formatDate(date); // Actualiza el controlador
   }
 
-  void onIncriptionEndDateChanged(DateTime value) {
-    state = state.copyWith(fechaFinInscripcion: value);
+  void onIncriptionEndDateChanged(DateTime date) {
+    state = state.copyWith(fechaFinInscripcion: date);
+    inscriptionEndDateController.text = formatDate(date); // Actualiza el controlador
   }
 
-  void onInscriptionStartTimeChanged(TimeOfDay value) {
-    state = state.copyWith(horaInicioInscripcion: value);
+  void onInscriptionStartTimeChanged(TimeOfDay time) {
+    state = state.copyWith(horaInicioInscripcion: time);
+    inscriptionStartTimeController.text = formatTimeWithAMPM(time);
   }
 
-  void onInscriptionEndTimeChanged(TimeOfDay value) {
-    state = state.copyWith(horaFinInscripcion: value);
+  void onInscriptionEndTimeChanged(TimeOfDay time) {
+    state = state.copyWith(horaFinInscripcion: time);
+    inscriptionEndTimeController.text = formatTimeWithAMPM(time);
   }
 
   void onEventPublicChanged(bool value) {

@@ -1,12 +1,16 @@
+import 'package:eventos_app/domain/enum/payment_method.dart';
+import 'package:eventos_app/presentation/providers/create_event_form_provider.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:eventos_app/presentation/shared/widgets/custom_checkbox.dart';
+import 'package:eventos_app/presentation/shared/widgets/custom_radiobutton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class InscriptionsForm extends StatelessWidget {
+class InscriptionsForm extends ConsumerWidget {
   const InscriptionsForm({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -97,18 +101,20 @@ class InscriptionsForm extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center, // Centra los checkboxes horizontalmente
                 children: [
                   IntrinsicWidth(
-                    child: CustomCheckBox(
-                      label: 'Público',
-                      value: true,
-                      onChanged: (value) {},
-                    ),
+                    child: CustomRadiobutton(
+                      label: 'Público', 
+                      value: true, 
+                      groupValue: ref.watch(createEventFormProvider).esPublico,
+                      onChanged: (value) => ref.read(createEventFormProvider.notifier).onEventPublicChanged(value),
+                    )
                   ),
-                  const SizedBox(width: 20), // Espacio entre los checkboxes
+                  const SizedBox(width: 50), // Espacio entre los checkboxes
                   IntrinsicWidth(
-                    child: CustomCheckBox(
-                      label: 'Privado',
-                      value: false,
-                      onChanged: (value) {},
+                    child: CustomRadiobutton(
+                      label: 'Privado', 
+                      value: false, 
+                      groupValue: ref.watch(createEventFormProvider).esPublico,
+                      onChanged: (value) => ref.read(createEventFormProvider.notifier).onEventPublicChanged(value),
                     ),
                   ),
                 ],
@@ -148,31 +154,42 @@ class InscriptionsForm extends StatelessWidget {
               ),
               const SizedBox(height: 10), // Espacio entre el texto y los checkboxes
 
-              CustomCheckBox(
-                label: 'Con tarjeta',
-                value: true,
-                onChanged: (value) {},
-              ),
-              CustomCheckBox(
-                label: 'En efectivo',
-                value: false,
-                onChanged: (value) {},
-              ),
-              CustomCheckBox(
-                label: 'G Pay / ApplePay',
-                value: false,
-                onChanged: (value) {},
-              ),
-              CustomCheckBox(
-                label: 'Paypal',
-                value: false,
-                onChanged: (value) {},
-              ),
-              CustomCheckBox(
-                label: 'Klarna',
-                value: false,
-                onChanged: (value) {},
-              ),
+              Column(
+                children: MetodoPago.values.map((metodo) {
+                  final metodoString = metodo.name;
+                  return CustomCheckBox(
+                    label: metodoString.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(0)}').trim(),
+                    value: ref.watch(createEventFormProvider).metodosPago.contains(metodoString),
+                    onChanged: (value) => ref.read(createEventFormProvider.notifier).onPaymentMethodsChanged(metodo, value ?? false),
+                  );
+                }).toList(),
+              )
+
+              // CustomCheckBox(
+              //   label: 'Con tarjeta',
+              //   value: true,
+              //   onChanged: (value) => ref.read(createEventFormProvider.notifier).onDifferentTimePerDayChanged(newValue ?? false);
+              // ),
+              // CustomCheckBox(
+              //   label: 'En efectivo',
+              //   value: false,
+              //   onChanged: (value) {},
+              // ),
+              // CustomCheckBox(
+              //   label: 'G Pay / ApplePay',
+              //   value: false,
+              //   onChanged: (value) {},
+              // ),
+              // CustomCheckBox(
+              //   label: 'Paypal',
+              //   value: false,
+              //   onChanged: (value) {},
+              // ),
+              // CustomCheckBox(
+              //   label: 'Klarna',
+              //   value: false,
+              //   onChanged: (value) {},
+              // ),
             ],
           ),
         ),

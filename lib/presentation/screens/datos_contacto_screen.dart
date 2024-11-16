@@ -1,5 +1,4 @@
 import 'package:eventos_app/presentation/shared/shared.dart';
-import 'package:eventos_app/presentation/shared/widgets/custom_checkbox.dart';
 import 'package:flutter/material.dart';
 
 class DatosContactoScreen extends StatelessWidget {

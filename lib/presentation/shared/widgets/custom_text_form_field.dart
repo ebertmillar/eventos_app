@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 
 class CustomTextFormField extends StatelessWidget {
 
-  
-
   final String label;
   final String? hint;
   final Color borderColor;
@@ -87,9 +85,10 @@ class CustomTextFormField extends StatelessWidget {
   }
 }
 
-class CustomAttachmentField extends StatefulWidget {
+class CustomAttachmentField extends StatelessWidget {
   final String label;
   final String buttonText;
+  final String? attachmentName;
   final VoidCallback onAttachmentAdded;
 
   const CustomAttachmentField({
@@ -97,25 +96,8 @@ class CustomAttachmentField extends StatefulWidget {
     required this.label,
     required this.buttonText,
     required this.onAttachmentAdded,
+    this.attachmentName,
   }) : super(key: key);
-
-  @override
-  _CustomAttachmentFieldState createState() => _CustomAttachmentFieldState();
-}
-
-class _CustomAttachmentFieldState extends State<CustomAttachmentField> {
-  String? attachmentName;
-
-  void _selectAttachment() {
-    // Aquí podrías abrir el selector de archivos y obtener el nombre del archivo seleccionado.
-    // Para propósitos de ejemplo, simularemos que se ha seleccionado un archivo.
-    setState(() {
-      attachmentName = "cartelera_evento.pdf"; // Reemplaza con el nombre del archivo seleccionado.
-    });
-
-    // Llama al callback si necesitas ejecutar una acción al adjuntar el archivo
-    widget.onAttachmentAdded();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +111,7 @@ class _CustomAttachmentFieldState extends State<CustomAttachmentField> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.label,
+            label,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
@@ -157,7 +139,7 @@ class _CustomAttachmentFieldState extends State<CustomAttachmentField> {
           // Botón para añadir documentos
           Center(
             child: ElevatedButton(
-              onPressed: _selectAttachment,
+              onPressed: onAttachmentAdded,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black87,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -166,7 +148,7 @@ class _CustomAttachmentFieldState extends State<CustomAttachmentField> {
                 ),
               ),
               child: Text(
-                widget.buttonText,
+                buttonText,
                 style: const TextStyle(color: Colors.amberAccent),
               ),
             ),

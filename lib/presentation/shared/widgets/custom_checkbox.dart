@@ -10,8 +10,8 @@ class CustomCheckBox extends StatelessWidget {
     super.key,
     required this.label,
     required this.value,
-    this.contentPadding,
     this.onChanged, 
+    this.contentPadding,
   });
 
   @override

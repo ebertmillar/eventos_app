@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 
-final registerFormProvider = StateNotifierProvider.autoDispose<RegisterFormNotifier,RegisterFormState>((ref) {
+final registerFormProvider = StateNotifierProvider<RegisterFormNotifier,RegisterFormState>((ref) {
 
   final registerUserCallback = ref.watch(authProvider.notifier).registerUser;
 

@@ -1,21 +1,47 @@
 import 'package:easy_stepper/easy_stepper.dart';
+import 'package:eventos_app/presentation/providers/create_event_form_provider.dart';
 import 'package:eventos_app/presentation/providers/step_provider.dart';
 import 'package:eventos_app/presentation/screens/agenda_form_screen.dart';
 import 'package:eventos_app/presentation/screens/datos_contacto_screen.dart';
+import 'package:eventos_app/presentation/screens/datos_del_evento_form.dart';
 import 'package:eventos_app/presentation/screens/incripciones_form.dart';
-import 'package:eventos_app/presentation/shared/shared.dart';
+import 'package:eventos_app/presentation/shared/widgets/custom_appbar.dart';
+import 'package:eventos_app/presentation/shared/widgets/custom_filled_button.dart';
 import 'package:eventos_app/presentation/shared/widgets/custom_outline_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'datos_del_evento_form.dart';
 
-class CreateEventScreen extends ConsumerWidget {
+class CreateEventScreen extends ConsumerStatefulWidget {
   const CreateEventScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CreateEventScreen> createState() => _CreateEventScreenState();
+}
+
+class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentStep = ref.watch(stepProvider);
+    final eventFormNotifier =ref.watch(createEventFormProvider);
 
     return Scaffold(
       appBar: const CustomAppbar(),
@@ -24,9 +50,9 @@ class CreateEventScreen extends ConsumerWidget {
           children: [
             // Línea de tiempo fija en la parte superior
             Container(
-              height: 55, // Altura fija para el stepper
+              height: 55,
               alignment: Alignment.center,
-              padding: EdgeInsets.all(4),
+              padding: const EdgeInsets.all(4),
               child: EasyStepper(
                 activeStep: currentStep,
                 direction: Axis.horizontal,
@@ -120,6 +146,7 @@ class CreateEventScreen extends ConsumerWidget {
             // Contenido desplazable
             Expanded(
               child: SingleChildScrollView(
+                controller: _scrollController, // Asigna el controlador
                 padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +156,7 @@ class CreateEventScreen extends ConsumerWidget {
                     if (currentStep == 2) const AgendaFormScreen(),
                     if (currentStep == 3) const DatosContactoScreen(),
 
-                    const SizedBox(height: 50,),
+                    const SizedBox(height: 25),
 
                     // Botones desplazables junto con el contenido
                     SizedBox(
@@ -147,8 +174,9 @@ class CreateEventScreen extends ConsumerWidget {
                                 onPressed: () {
                                   if (currentStep > 0) {
                                     ref.read(stepProvider.notifier).previousStep();
+                                    _scrollToTop(); // Desplaza hacia arriba
                                   } else {
-                                    context.go('/'); // Redirige a la ruta inicial o específica
+                                    GoRouter.of(context).go('/');// Cierra el diálogo o regresa a la pantalla anterior
                                   }
                                 },
                               ),
@@ -159,7 +187,10 @@ class CreateEventScreen extends ConsumerWidget {
                                 text: currentStep == 3 ? 'Crear evento' : 'Siguiente',
                                 textColor: Colors.orange,
                                 buttonColor: Colors.black87,
-                                onPressed: () => ref.read(stepProvider.notifier).nextStep(),
+                                onPressed: () {
+                                  ref.read(stepProvider.notifier).nextStep();
+                                  _scrollToTop(); // Desplaza hacia arriba
+                                },
                               ),
                             ),
                           ],
@@ -177,4 +208,3 @@ class CreateEventScreen extends ConsumerWidget {
     );
   }
 }
-

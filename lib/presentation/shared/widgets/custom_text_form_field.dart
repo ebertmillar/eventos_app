@@ -49,6 +49,8 @@ class CustomTextFormField extends StatelessWidget {
             inputFormatters: inputFormatters, 
             textAlignVertical: TextAlignVertical.bottom,
             decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white, 
               hintText: hint,
               hintStyle: TextStyle(fontSize: 14, 
               color: errorMessage != null ? Colors.red.shade800 : Colors.black54,), 
@@ -85,76 +87,3 @@ class CustomTextFormField extends StatelessWidget {
   }
 }
 
-class CustomAttachmentField extends StatelessWidget {
-  final String label;
-  final String buttonText;
-  final String? attachmentName;
-  final VoidCallback onAttachmentAdded;
-
-  const CustomAttachmentField({
-    Key? key,
-    required this.label,
-    required this.buttonText,
-    required this.onAttachmentAdded,
-    this.attachmentName,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black45),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Muestra el nombre del archivo adjunto o el hint
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.grey[200],
-            ),
-            child: Text(
-              attachmentName ?? 'Adjunta cartelería, folletos, etc.',
-              style: TextStyle(
-                fontSize: 14,
-                color: attachmentName != null ? Colors.black87 : Colors.black54,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Botón para añadir documentos
-          Center(
-            child: ElevatedButton(
-              onPressed: onAttachmentAdded,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-              child: Text(
-                buttonText,
-                style: const TextStyle(color: Colors.amberAccent),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

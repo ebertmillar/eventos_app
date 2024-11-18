@@ -2,7 +2,7 @@
 
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:eventos_app/presentation/providers/auth_provider.dart';
-import 'package:eventos_app/presentation/shared/infrastucture/inputs/sector.dart';
+import 'package:eventos_app/presentation/shared/infrastucture/inputs/register/sector.dart';
 import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,7 +84,6 @@ void onPrefixChanged(CountryCode country) {
   void onAceptaComunicacionesChanged(bool value) {
     state = state.copyWith(aceptaComunicaciones: value);
   }
-
 
 
   onFormSubmit(BuildContext context ) async {

@@ -44,7 +44,7 @@ class InscriptionsForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedDate = await showDatePickerHelper(
                       context: context,
-                      initialDate: eventFormState.fechaInicioInscripcion,
+                      initialDate: eventFormState.inscriptionStartDate,
                       helpText: 'Selecciona una fecha',
                     );
                     if (selectedDate != null) {
@@ -66,7 +66,7 @@ class InscriptionsForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedDate = await showDatePickerHelper(
                       context: context,
-                      initialDate: eventFormState.fechaFinInscripcion,
+                      initialDate: eventFormState.inscriptionEndDate,
                       helpText: 'Selecciona la fecha de fin de inscripción',
                     );
                     if (selectedDate != null) {
@@ -93,7 +93,7 @@ class InscriptionsForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedTime = await showTimePickerHelper(
                       context: context,
-                      initialTime: eventFormState.horaInicioInscripcion, 
+                      initialTime: eventFormState.inscriptionStartTime, 
                       helpText: 'Selecciona la hora', 
                     );
                     if (selectedTime != null) {
@@ -115,7 +115,7 @@ class InscriptionsForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedTime = await showTimePickerHelper(
                       context: context,
-                      initialTime: eventFormState.horaFinInscripcion, 
+                      initialTime: eventFormState.inscriptionEndTime, 
                       helpText: 'Selecciona la hora', 
                     );
                     if (selectedTime != null) {
@@ -131,6 +131,7 @@ class InscriptionsForm extends ConsumerWidget {
         // Selección de evento público o privado
         Container(
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(color: Colors.black45),
             borderRadius: BorderRadius.circular(5),
           ),
@@ -150,7 +151,7 @@ class InscriptionsForm extends ConsumerWidget {
                     child: CustomRadiobutton(
                       label: 'Público', 
                       value: true, 
-                      groupValue: ref.watch(createEventFormProvider).esPublico,
+                      groupValue: ref.watch(createEventFormProvider).isPublic,
                       onChanged: (value) => ref.read(createEventFormProvider.notifier).onEventPublicChanged(value),
                     )
                   ),
@@ -159,7 +160,7 @@ class InscriptionsForm extends ConsumerWidget {
                     child: CustomRadiobutton(
                       label: 'Privado', 
                       value: false, 
-                      groupValue: ref.watch(createEventFormProvider).esPublico,
+                      groupValue: ref.watch(createEventFormProvider).isPublic,
                       onChanged: (value) => eventFormNotifier.onEventPublicChanged(value),
                     ),
                   ),
@@ -197,6 +198,7 @@ class InscriptionsForm extends ConsumerWidget {
         // Selección de métodos de pago
         Container(
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(color: Colors.black45),
             borderRadius: BorderRadius.circular(5),
           ),
@@ -216,7 +218,7 @@ class InscriptionsForm extends ConsumerWidget {
                   final metodoString = metodo.name;
                   return CustomCheckBox(
                     label: metodoString.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(0)}').trim(),
-                    value: ref.watch(createEventFormProvider).metodosPago.contains(metodoString),
+                    value: ref.watch(createEventFormProvider).paymentMethods.contains(metodoString),
                     onChanged: (value) => ref.read(createEventFormProvider.notifier).onPaymentMethodsChanged(metodo, value ?? false),
                   );
                 }).toList(),
@@ -230,6 +232,7 @@ class InscriptionsForm extends ConsumerWidget {
         // Restricción por edad
         Container(
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(color: Colors.black45),
             borderRadius: BorderRadius.circular(5),
           ),

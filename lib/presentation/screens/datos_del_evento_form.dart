@@ -60,7 +60,7 @@ class DatosDelEventoForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedDate = await showDatePickerHelper(
                       context: context,
-                      initialDate: eventFormState.fechaInicio,
+                      initialDate: eventFormState.startDate,
                       helpText: 'Selecciona una fecha', // Puedes personalizar esto
                     );
                     selectedDate != null ? eventFormNotifier.onStartDateChanged(selectedDate) : null;
@@ -81,7 +81,7 @@ class DatosDelEventoForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedDate = await showDatePickerHelper(
                       context: context,
-                      initialDate: eventFormState.fechaFin,
+                      initialDate: eventFormState.endDate,
                       helpText: 'Selecciona una fecha', // Puedes personalizar esto
                     ); 
                     selectedDate != null ? eventFormNotifier.onEndDateChanged(selectedDate) : null;
@@ -105,7 +105,7 @@ class DatosDelEventoForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedTime = await showTimePickerHelper(
                       context: context,
-                      initialTime: eventFormState.horaInicio, 
+                      initialTime: eventFormState.startTime, 
                       helpText: 'Selecciona la hora', 
                     );
                     if (selectedTime != null) {
@@ -127,7 +127,7 @@ class DatosDelEventoForm extends ConsumerWidget {
                   onPressed: () async {
                     final selectedTime = await showTimePickerHelper(
                       context: context,
-                      initialTime: eventFormState.horaFin, 
+                      initialTime: eventFormState.endTime, 
                       helpText: 'Selecciona la hora', 
                     );
                     if (selectedTime != null) {
@@ -142,7 +142,7 @@ class DatosDelEventoForm extends ConsumerWidget {
         const SizedBox(height: 5),
         CustomCheckBox(
           label: '¿Cada día comienza  y termina a una hora distinta?', 
-          value: eventFormState.horariosDiferentesPorDia ?? false,
+          value: eventFormState.differentSchedulesPerDay ?? false,
           contentPadding: const EdgeInsets.symmetric(horizontal: 15),
           onChanged: (newValue) {
               eventFormNotifier.onDifferentTimePerDayChanged(newValue ?? false);

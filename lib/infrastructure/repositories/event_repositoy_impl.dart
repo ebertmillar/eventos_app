@@ -1,6 +1,6 @@
-import 'package:eventos_app/domain/entities/event.dart';
+import 'package:eventos_app/domain/entities/entities.dart';
 import 'package:eventos_app/domain/repositories/event_repository.dart';
-import 'package:flutter/src/material/time.dart';
+import 'package:flutter/material.dart';
 
 class EventRepositoyImpl extends EventRepository {
   @override
@@ -23,7 +23,7 @@ class EventRepositoyImpl extends EventRepository {
       int aforo,
       double costoInscripcion,
       List<String> metodosPago,
-      List<DiaAgenda> agenda,
+      List<AgendaDay> agenda,
       String? informacionAdicional,
       List<String>? documentosAdjuntos,
       bool restriccionEdad,
@@ -59,7 +59,7 @@ class EventRepositoyImpl extends EventRepository {
       int aforo,
       double costoInscripcion,
       List<String> metodosPago,
-      List<DiaAgenda> agenda,
+      List<AgendaDay> agenda,
       String? informacionAdicional,
       List<String>? documentosAdjuntos,
       bool restriccionEdad,

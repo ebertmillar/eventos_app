@@ -8,13 +8,13 @@ class CustomImagePickerField extends StatelessWidget {
   final Widget? suffixIcon;
 
   const CustomImagePickerField({
-    Key? key,
+    super.key,
     required this.label,
     required this.hint,
     required this.onPickImage,
     this.imageName,
     this.suffixIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +27,7 @@ class CustomImagePickerField extends StatelessWidget {
             width: double.infinity, // Ocupa todo el ancho disponible
             padding: const EdgeInsets.only(top: 25, left: 10, bottom: 5, right: 45),
             decoration: BoxDecoration(
+              color: Colors.white,
               border: Border.all(color: Colors.black45, width: 1),
               borderRadius: BorderRadius.circular(5),
             ),

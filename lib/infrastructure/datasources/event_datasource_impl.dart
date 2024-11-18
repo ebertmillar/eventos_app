@@ -1,5 +1,5 @@
 import 'package:eventos_app/domain/datasources/event_datasource.dart';
-import 'package:eventos_app/domain/entities/event.dart';
+import 'package:eventos_app/domain/entities/entities.dart';
 import 'package:flutter/material.dart';
 
 class EventDatasourceImpl extends EventoDatasource {
@@ -23,7 +23,7 @@ class EventDatasourceImpl extends EventoDatasource {
     int aforo,
     double costoInscripcion,
     List<String> metodosPago,
-    List<DiaAgenda> agenda,
+    List<AgendaDay> agenda,
     String? informacionAdicional,
     List<String>? documentosAdjuntos,
     bool restriccionEdad,
@@ -59,7 +59,7 @@ class EventDatasourceImpl extends EventoDatasource {
     int aforo,
     double costoInscripcion,
     List<String> metodosPago,
-    List<DiaAgenda> agenda,
+    List<AgendaDay> agenda,
     String? informacionAdicional,
     List<String>? documentosAdjuntos,
     bool restriccionEdad,

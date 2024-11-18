@@ -27,13 +27,14 @@ class CustomRadiobutton extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(2), // Espacio entre los cuadrados
               decoration: BoxDecoration(
+                color: Colors.white,
                 border: Border.all(color: Colors.black, width: 1),
                 borderRadius: BorderRadius.circular(4), // Borde externo cuadrado
               ),
               child: Container(
                 width: 18,
                 height: 18,
-                decoration: BoxDecoration(
+                decoration: BoxDecoration(                
                   border: Border.all(color: Colors.black54, width: 2),
                   borderRadius: BorderRadius.circular(2), // Borde interno cuadrado
                   color: value == groupValue ? Colors.black : Colors.white,

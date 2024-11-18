@@ -9,12 +9,12 @@ class CustomFormFieldNumber extends StatelessWidget {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       InternationalPhoneNumberInput(
         onInputChanged: (PhoneNumber number) {
-          print(number.phoneNumber);
+          
         },
         onInputValidated: (bool value) {
           print(value);
         },
-        selectorConfig: SelectorConfig(
+        selectorConfig: const SelectorConfig(
           selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
           useBottomSheetSafeArea: true,
         ),

@@ -39,12 +39,13 @@ class InscriptionsForm extends ConsumerWidget {
                 hint: '12/12/2020',
                 keyboardType: TextInputType.text,
                 controller: eventFormNotifier.inscriptionStartDateController,
+                errorMessage: eventFormState.inscriptionStartDate.errorMessage,                
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today),
                   onPressed: () async {
                     final selectedDate = await showDatePickerHelper(
                       context: context,
-                      initialDate: eventFormState.inscriptionStartDate,
+                      initialDate: eventFormState.inscriptionStartDate.value,
                       helpText: 'Selecciona una fecha',
                     );
                     if (selectedDate != null) {
@@ -61,16 +62,17 @@ class InscriptionsForm extends ConsumerWidget {
                 hint: '12/12/2020',
                 keyboardType: TextInputType.datetime,
                 controller: eventFormNotifier.inscriptionEndDateController,
+                errorMessage: eventFormState.inscriptionEndDate.errorMessage,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today),
                   onPressed: () async {
                     final selectedDate = await showDatePickerHelper(
                       context: context,
-                      initialDate: eventFormState.inscriptionEndDate,
+                      initialDate: eventFormState.inscriptionEndDate.value,
                       helpText: 'Selecciona la fecha de fin de inscripción',
                     );
                     if (selectedDate != null) {
-                      eventFormNotifier.onIncriptionEndDateChanged(selectedDate);
+                      eventFormNotifier.onInscriptionEndDateChanged(selectedDate);
                     }
                   },
                 ),

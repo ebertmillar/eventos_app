@@ -102,9 +102,9 @@ void _showAddDayDialog(BuildContext context, WidgetRef ref) async {
 
   final selectedDate = await showDatePickerHelper(
     context: context,
-    initialDate: eventFormState.startDate ?? DateTime.now(),
-    firstDate: eventFormState.startDate ?? DateTime.now(),
-    lastDate: eventFormState.endDate ?? DateTime.now().add(const Duration(days: 365)),
+    initialDate: eventFormState.startDate.value ?? DateTime.now(),
+    firstDate: eventFormState.startDate.value ?? DateTime.now(),
+    lastDate: eventFormState.endDate.value ?? DateTime.now().add(const Duration(days: 365)),
     helpText: 'Selecciona un día para el evento',
   );
 

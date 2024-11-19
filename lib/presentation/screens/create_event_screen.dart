@@ -188,6 +188,14 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                                 textColor: Colors.orange,
                                 buttonColor: Colors.black87,
                                 onPressed: () {
+                                  if(currentStep == 0){
+                                    ref.read(createEventFormProvider.notifier).onSubmitEventInformation();
+
+                                    // No permitir avanzar si hay errores
+                                    final eventFormState = ref.watch(createEventFormProvider);
+                                    //if (!eventFormState.isEventInfoPosted || !eventFormState.isValid) return;       
+
+                                  }
                                   ref.read(stepProvider.notifier).nextStep();
                                   _scrollToTop(); // Desplaza hacia arriba
                                 },

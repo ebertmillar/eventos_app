@@ -208,8 +208,8 @@ class _RegisterForm extends ConsumerWidget {
             onPressed: registerForm.isPosting 
               ? null
               : () => ref.read(registerFormProvider.notifier).onFormSubmit(context),
-            text: registerForm.isPosting ? null : 'Crear cuenta',
-            child: registerForm.isPosting 
+                  text: registerForm.isPosting ? null : 'Crear cuenta',
+                  child: registerForm.isPosting 
               ? const SizedBox(
                   width: 24.0,  // Ajusta el ancho del círculo
                   height: 24.0, // Ajusta el alto del círculo

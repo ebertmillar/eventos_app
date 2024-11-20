@@ -36,9 +36,9 @@ class FilePickerField extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if ((eventFormState.documentosAdjuntos ?? []).isNotEmpty)
+                if ((eventFormState.attachedDocument ?? []).isNotEmpty)
                   Column(
-                    children: eventFormState.documentosAdjuntos!
+                    children: eventFormState.attachedDocument!
                         .map((filePath) => ListTile(
                               contentPadding: EdgeInsets.zero,
                               title: Text(
@@ -48,7 +48,7 @@ class FilePickerField extends ConsumerWidget {
                               trailing: IconButton(
                                 icon: const Icon(Icons.clear, color: Colors.red),
                                 onPressed: () {
-                                  final index = eventFormState.documentosAdjuntos!
+                                  final index = eventFormState.attachedDocument!
                                       .indexOf(filePath);
                                   eventFormNotifier.removeFile(index);
                                 },
@@ -56,7 +56,7 @@ class FilePickerField extends ConsumerWidget {
                             ))
                         .toList(),
                   ),
-                if ((eventFormState.documentosAdjuntos ?? []).isEmpty && hint != null)
+                if ((eventFormState.attachedDocument ?? []).isEmpty && hint != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 0, left: 5),
                     child: Text(

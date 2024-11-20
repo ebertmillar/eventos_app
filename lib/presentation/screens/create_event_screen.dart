@@ -190,12 +190,44 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                                 onPressed: () {
                                   if(currentStep == 0){
                                     ref.read(createEventFormProvider.notifier).onSubmitEventInformation();
-
-                                    // No permitir avanzar si hay errores
                                     final eventFormState = ref.watch(createEventFormProvider);
-                                    //if (!eventFormState.isEventInfoPosted || !eventFormState.isValid) return;       
-
+                                    if (!eventFormState.isEventInfoPosted || !eventFormState.isValid) return;       
                                   }
+                                  if(currentStep == 1){
+                                    ref.read(createEventFormProvider.notifier).onSubmitEventInscription();
+                                    final eventFormState = ref.watch(createEventFormProvider);
+                                    if (!eventFormState.isEventIncriptionPosted || !eventFormState.isValid) return;   
+                                  }
+                                  if(currentStep == 2){
+                                    ref.read(createEventFormProvider.notifier).onSubmitEventAgenda();
+                                    final eventFormState = ref.watch(createEventFormProvider);
+                                    if (!eventFormState.isEventAgendaPosted || !eventFormState.isValid) return;   
+                                  }
+                                  if (currentStep == 3) {
+                                    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+                                    final eventFormState = ref.watch(createEventFormProvider);
+
+                                    eventFormNotifier.onSubmitCreateEvent();
+                                    // Validar si todos los pasos anteriores son válidos
+                                    if (!eventFormState.isEventInfoPosted ||
+                                        !eventFormState.isEventIncriptionPosted ||
+                                        !eventFormState.isEventAgendaPosted ||
+                                        !eventFormState.isEventContactPosted ||
+                                        !eventFormState.isValid) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Por favor, completa toda la información del evento.')),
+                                      );
+                                      return;
+                                    }
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Evento creado correctamente')),
+                                    );
+
+                                    // Aquí puedes redirigir al usuario a otra pantalla o realizar cualquier otra acción necesaria
+                                    GoRouter.of(context).go('/success'); // Redirigir al usuario a una página de éxito, por ejemplo
+                                  }
+                                  
                                   ref.read(stepProvider.notifier).nextStep();
                                   _scrollToTop(); // Desplaza hacia arriba
                                 },

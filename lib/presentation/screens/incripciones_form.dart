@@ -39,7 +39,9 @@ class InscriptionsForm extends ConsumerWidget {
                 hint: '12/12/2020',
                 keyboardType: TextInputType.text,
                 controller: eventFormNotifier.inscriptionStartDateController,
-                errorMessage: eventFormState.inscriptionStartDate.errorMessage,                
+                errorMessage: eventFormState.isEventIncriptionPosted 
+                  ? eventFormState.inscriptionStartDate.errorMessage 
+                  : null,              
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today),
                   onPressed: () async {
@@ -62,7 +64,9 @@ class InscriptionsForm extends ConsumerWidget {
                 hint: '12/12/2020',
                 keyboardType: TextInputType.datetime,
                 controller: eventFormNotifier.inscriptionEndDateController,
-                errorMessage: eventFormState.inscriptionEndDate.errorMessage,
+                errorMessage: eventFormState.isEventIncriptionPosted 
+                  ? eventFormState.inscriptionEndDate.errorMessage 
+                  : null,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today),
                   onPressed: () async {
@@ -153,7 +157,7 @@ class InscriptionsForm extends ConsumerWidget {
                     child: CustomRadiobutton(
                       label: 'Público', 
                       value: true, 
-                      groupValue: ref.watch(createEventFormProvider).isPublic,
+                      groupValue: eventFormState.isPublic,
                       onChanged: (value) => ref.read(createEventFormProvider.notifier).onEventPublicChanged(value),
                     )
                   ),
@@ -162,7 +166,7 @@ class InscriptionsForm extends ConsumerWidget {
                     child: CustomRadiobutton(
                       label: 'Privado', 
                       value: false, 
-                      groupValue: ref.watch(createEventFormProvider).isPublic,
+                      groupValue: eventFormState.isPublic,
                       onChanged: (value) => eventFormNotifier.onEventPublicChanged(value),
                     ),
                   ),
@@ -179,6 +183,7 @@ class InscriptionsForm extends ConsumerWidget {
           hint: 'Introduce el nº de entradas disponibles',
           keyboardType: TextInputType.number,
           controller: eventFormNotifier.eventCapacityController,
+          errorMessage: eventFormState.isEventIncriptionPosted ? eventFormState.capacity.errorMessage : null ,
           onChanged: (value){
             final intValue = int.tryParse(value);
             intValue != null ? eventFormNotifier.onEventCapacityChanged(intValue) : null;
@@ -191,6 +196,9 @@ class InscriptionsForm extends ConsumerWidget {
           hint: 'Introduce el precio de la entrada',
           keyboardType: TextInputType.number,
           controller: eventFormNotifier.eventCostController,
+          errorMessage: eventFormState.isEventIncriptionPosted 
+                  ? eventFormState.inscriptionCost.errorMessage 
+                  : null,
           onChanged: (value){
             final doubleValue = double.tryParse(value);
             doubleValue != null ? eventFormNotifier.onCostChanged(doubleValue) : null;
@@ -198,35 +206,46 @@ class InscriptionsForm extends ConsumerWidget {
         ),
 
         // Selección de métodos de pago
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black45),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '¿Qué método de pago vas a usar? Puedes elegir varios',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), 
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black45),
+                borderRadius: BorderRadius.circular(5),
               ),
-
-              const SizedBox(height: 10), 
-
-              Column(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: MetodoPago.values.map((metodo) {
                   final metodoString = metodo.name;
+
+                  // Access the value of PaymentMethods (a List<String>) to check if it contains the current method
+                  final isSelected = eventFormState.paymentMethods.value.contains(metodoString);
+
                   return CustomCheckBox(
-                    label: metodoString.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(0)}').trim(),
-                    value: ref.watch(createEventFormProvider).paymentMethods.contains(metodoString),
-                    onChanged: (value) => ref.read(createEventFormProvider.notifier).onPaymentMethodsChanged(metodo, value ?? false),
+                    label: metodoString
+                        .replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(0)}')
+                        .trim(), // Format label
+                    value: isSelected, // Determine if the checkbox should be checked
+                    onChanged: (value) => ref
+                        .read(createEventFormProvider.notifier)
+                        .onPaymentMethodsChanged(metodo, value ?? false), // Update state
                   );
                 }).toList(),
-              )
-            ],
-          ),
+              ),
+            ),
+            // Mostrar el error si no hay métodos de pago seleccionados
+            if (!eventFormState.paymentMethods.isValid)
+              Padding(
+                padding: const EdgeInsets.only(top: 2.0, left: 5.0),
+                child: Text(
+                  eventFormState.paymentMethods.errorMessage ?? '',
+                  style: TextStyle(color: Colors.red[800], fontSize: 12),
+                ),
+              ),
+          ],
         ),
 
         const SizedBox(height: 20),

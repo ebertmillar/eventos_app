@@ -5,10 +5,14 @@ import 'package:eventos_app/domain/enum/payment_method.dart';
 import 'package:eventos_app/helpers/date_time_formatters.dart';
 import 'package:eventos_app/helpers/form_date.dart';
 import 'package:eventos_app/presentation/shared/infrastucture/infractructure.dart';
+import 'package:eventos_app/presentation/shared/infrastucture/inputs/event/additional_info.dart';
 import 'package:eventos_app/presentation/shared/infrastucture/inputs/event/inscription_cost.dart';
 import 'package:eventos_app/presentation/shared/infrastucture/inputs/event/inscription_end_date.dart';
 import 'package:eventos_app/presentation/shared/infrastucture/inputs/event/inscription_start_date.dart';
+import 'package:eventos_app/presentation/shared/infrastucture/inputs/event/payment_methods.dart';
 import 'package:eventos_app/presentation/shared/infrastucture/inputs/event/venue_capacity%20copy.dart';
+import 'package:eventos_app/presentation/shared/infrastucture/inputs/social_media.dart';
+import 'package:eventos_app/presentation/shared/shared.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -532,14 +536,11 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
       inscriptionStartDate: newInscriptionStartDate,
       inscriptionEndDate: newInscriptionEndDate,
       isValid: Formz.validate([
-        state.name,
-        state.description,
-        state.startDate,
-        state.endDate,
-        state.location,
-        state.headerImage,
         newInscriptionStartDate,
         newInscriptionEndDate,
+        state.capacity,
+        state.inscriptionCost,
+        state.paymentMethods
       ]),
     );
 
@@ -557,14 +558,11 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
     state = state.copyWith(
       inscriptionEndDate: newInscriptionEndDate,
       isValid: Formz.validate([
-        state.name,
-        state.description,
-        state.startDate,
-        state.endDate,
-        state.location,
-        state.headerImage,
         state.inscriptionStartDate,
         newInscriptionEndDate,
+        state.capacity,
+        state.inscriptionCost,
+        state.paymentMethods
       ]),
     );
 
@@ -593,7 +591,9 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
       isValid: Formz.validate([
         state.inscriptionStartDate, 
         state.inscriptionEndDate,
-        newVenueCapacity
+        newVenueCapacity,
+        state.inscriptionCost,
+        state.paymentMethods
       ])
     );
   }
@@ -608,23 +608,35 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
         state.inscriptionStartDate, 
         state.inscriptionEndDate,
         state.capacity,
-        newInscriptionCost        
+        newInscriptionCost,
+        state.paymentMethods        
       ])
     );
   }
 
   void onPaymentMethodsChanged(MetodoPago method, bool value) {
-    final paymentMethod = List<String>.from(state.paymentMethods);
-    final stringMethod = method.name;
+    final currentMethods = List<String>.from(state.paymentMethods.value);
+    final methodName = method.name;
 
     if (value) {
-        paymentMethod.add(stringMethod);
+      currentMethods.add(methodName);
     } else {
-        paymentMethod.remove(stringMethod);
+      currentMethods.remove(methodName);
     }
 
-    state = state.copyWith(paymentMethods: paymentMethod);
+    // Crear un nuevo estado de métodos de pago y validarlo
+    final newPaymentMethods = PaymentMethods.dirty(value: currentMethods);
 
+    state = state.copyWith(
+      paymentMethods: newPaymentMethods,
+      isValid: Formz.validate([
+        state.inscriptionStartDate, // Otros campos del formulario
+        state.inscriptionEndDate,
+        state.capacity, // Validar capacidad
+        state.inscriptionCost, // Validar costo de inscripción
+        newPaymentMethods, // Validar métodos de pago
+      ]),
+    );
   }
 
 
@@ -718,36 +730,40 @@ void removeActivity(String dia, int index) {
   );
 }
 
-  void onAdditionalInfoChanged(String value) {
-    state = state.copyWith(informacionAdicional: value);
+  void onAdditionalInfoChanged(String? additionalInfo) {
+    final newAdditionalInfo = AdditionalInfo.dirty(value: additionalInfo ?? '');
+    state = state.copyWith(
+      additionalInfo: newAdditionalInfo,
+      isValid: Formz.validate([newAdditionalInfo]),      
+    );
   }
 
-  void onAttachedDocumentsChanged(List<String> value) {
-    state = state.copyWith(documentosAdjuntos: value);
+  void onAttachedDocumentsChanged(List<String>? value) {
+    state = state.copyWith(attachedDcoment: value);
   }
 
   Future<void> pickFiles() async {
     final result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result != null && result.files.isNotEmpty) {
       // Agregamos los nuevos archivos al estado actual
-      final currentFiles = List<String>.from(state.documentosAdjuntos ?? []);
+      final currentFiles = List<String>.from(state.attachedDocument ?? []);
       final newFiles = result.files.map((file) => file.path!).toList();
-      state = state.copyWith(documentosAdjuntos: [...currentFiles, ...newFiles]);
+      state = state.copyWith(attachedDcoment: [...currentFiles, ...newFiles]);
     }
   }
 
   void removeFile(int index) {
     // Verifica si hay archivos en el estado
-    final currentFiles = List<String>.from(state.documentosAdjuntos ?? []);
+    final currentFiles = List<String>.from(state.attachedDocument ?? []);
     if (index >= 0 && index < currentFiles.length) {
       currentFiles.removeAt(index);
-      state = state.copyWith(documentosAdjuntos: currentFiles);
+      state = state.copyWith(attachedDcoment: currentFiles);
     }
   }
 
   void clearFiles() {
     // Limpia todos los archivos
-    state = state.copyWith(documentosAdjuntos: []);
+    state = state.copyWith(attachedDcoment: []);
   }
 
 
@@ -757,37 +773,118 @@ void removeActivity(String dia, int index) {
     state = state.copyWith(restriccionEdad: value);
   }
 
-  void onContactNameChanged(String value) {
-    state = state.copyWith(nameContacto: value);
+  void onContactNameChanged(String contactName) {
+    final newContactName = CompanyName.dirty(value: contactName);
+    state = state.copyWith(
+      contactName: newContactName,
+      isValid: Formz.validate([
+        newContactName, 
+        state.contactPhone, 
+        state.contactEmail,
+        ])
+    );
   }
 
-  void onContactPhoneChanged(String value) {
-    state = state.copyWith(telefonoContacto: value);
+  void onContactPhoneChanged(String contactPhone) {
+    final newContactPhone = Phone.dirty(value: contactPhone);
+    state = state.copyWith(
+      contactPhone: newContactPhone,
+      isValid: Formz.validate([
+        state.contactName, 
+        newContactPhone, 
+        state.contactEmail,
+        ])
+    );
   }
 
-  void onContactEmailChanged(String value) {
-    state = state.copyWith(emailContacto: value);
+  void onContactEmailChanged(String contactEmail) {
+    final newContactEmail = Email.dirty(value: contactEmail);
+    state = state.copyWith(
+      contactEmail: newContactEmail,
+      isValid: Formz.validate([
+        state.contactName, 
+        state.contactPhone,
+        newContactEmail, 
+        ])
+    );
   }
 
-  void onWebpageChanged(String value) {
-  state = state.copyWith(webpage: value);
+  void onWebpageChanged(String? webpage) {
+  final newWebpage = SocialMedia.dirty(value: webpage ?? '');
+    state = state.copyWith(
+      webpage: newWebpage,
+      isValid: Formz.validate([
+        state.contactName, 
+        state.contactPhone,
+        state.contactEmail,
+        ])
+    );
   }
 
-  void onInstagramChanged(String value) {
-    state = state.copyWith(instagram: value);
+  void onInstagramChanged(String? instagram) {
+    final newInstagram = SocialMedia.dirty(value: instagram ?? '');
+    state = state.copyWith(
+      instagram: newInstagram,
+      isValid: Formz.validate([
+        state.contactName, 
+        state.contactPhone,
+        state.contactEmail,
+      ])
+    );
   }
 
-  void onFacebookChanged(String value) {
-    state = state.copyWith(facebook: value);
+  void onFacebookChanged(String? facebook) {
+    final newFacebook = SocialMedia.dirty(value: facebook ?? '');
+    state = state.copyWith(
+      facebook: newFacebook,
+      isValid: Formz.validate([
+        state.contactName, 
+        state.contactPhone,
+        state.contactEmail,
+      ])
+    );
   }
 
-  void onYouTubeChanged(String value) {
-    state = state.copyWith(youtube: value);
+  void onYouTubeChanged(String? youtube) {
+    final newYoutube = SocialMedia.dirty(value: youtube ?? '');
+    state = state.copyWith(
+      youtube: newYoutube,
+      isValid: Formz.validate([
+        state.contactName, 
+        state.contactPhone,
+        state.contactEmail,
+      ])
+    );
   }
 
-  void onLinkedInChanged(String value) {
-    state = state.copyWith(linkedin: value);
+  void onLinkedInChanged(String? linkedin) {
+    final newLinkedin = SocialMedia.dirty(value: linkedin ?? '');
+    state = state.copyWith(
+      linkedin: newLinkedin,
+      isValid: Formz.validate([
+        state.contactName, 
+        state.contactPhone,
+        state.contactEmail,
+      ])
+    );
   }
+
+
+  void onSubmitCreateEvent(){
+    onSubmitEventInformation();
+    if (!state.isEventInfoPosted) return;
+
+    onSubmitEventInscription();
+    if (!state.isEventIncriptionPosted) return;
+
+    onSubmitEventAgenda();
+    if (!state.isEventAgendaPosted) return;
+
+    onSubmitEventContact();
+    if (!state.isEventContactPosted) return;
+
+    print('Evento creado exitosamente.');
+    }
 
 
  
@@ -805,8 +902,6 @@ void removeActivity(String dia, int index) {
     state = state.copyWith(isEventInfoPosted: true);
     print('Información del evento validada correctamente.');
   }
-
-
 
   _touchFieldsEventInformation(){
     final name = EventName.dirty(value: state.name.value);
@@ -833,13 +928,138 @@ void removeActivity(String dia, int index) {
 
   }
 
-}
 
+  void onSubmitEventInscription() {
+    // Validar y actualizar campos
+    _touchFieldsEventInscription();
+
+    // Solo permite continuar si el formulario es válido
+    if (!state.isValid) {
+      print('Errores encontrados en la sección de Información del Evento.');
+      return;
+    }
+
+    // Marcar como enviado
+    state = state.copyWith(isEventIncriptionPosted: true);
+    print('inscripcion del evento validada correctamente.');
+  }
+
+
+
+  _touchFieldsEventInscription(){
+    final inscriptionStartDate = InscriptionStartDate.dirty(value: state.inscriptionStartDate.value);
+    final inscriptionEndDate = InscriptionEndDate.dirty(value: state.inscriptionEndDate.value);
+    final capacity = VenueCapacity.dirty(value: state.capacity.value);
+    final inscriptionCost = InscriptionCost.dirty(value: state.inscriptionCost.value);
+    final paymentMethods = PaymentMethods.dirty(value: state.paymentMethods.value);
+
+    state = state.copyWith(
+      isEventIncriptionPosted: true,
+      inscriptionStartDate: inscriptionStartDate,
+      inscriptionEndDate: inscriptionEndDate,
+      capacity: capacity,
+      inscriptionCost: inscriptionCost,
+      paymentMethods: paymentMethods,
+      isValid: Formz.validate([
+        inscriptionStartDate, 
+        inscriptionEndDate, 
+        capacity, 
+        inscriptionCost, 
+        paymentMethods
+      ])
+    );  
+  }
+
+  
+  void onSubmitEventAgenda() {
+    // Validar y actualizar campos
+    _touchFieldsEventAgenda();
+
+    // Solo permite continuar si el formulario es válido
+    if (!state.isValid) {
+      print('Errores encontrados en la sección de Información del Evento.');
+      return;
+    }
+
+    // Marcar como enviado
+    state = state.copyWith(isEventAgendaPosted: true);
+    print('Información de la agenda correctamente.');
+  }
+
+  _touchFieldsEventAgenda(){
+    final List<AgendaDay> agenda = state.agenda;
+    final additionalInfo = AdditionalInfo.dirty(value: state.additionalInfo?.value ?? '') ;
+    final List<String>? attachedDocument = state.attachedDocument;
+
+    state = state.copyWith(
+      isEventAgendaPosted: true,
+      agenda: agenda,
+      additionalInfo: additionalInfo,
+      attachedDcoment: attachedDocument,
+      isValid: Formz.validate([additionalInfo])      
+    ); 
+  }
+
+  void onSubmitEventContact() {
+    // Validar y actualizar campos
+    _touchFieldsEventContact();
+
+    // Solo permite continuar si el formulario es válido
+    if (!state.isValid) {
+      print('Errores encontrados en la sección de Información del Evento.');
+      return;
+    }
+
+    // Marcar como enviado
+    state = state.copyWith(isEventContactPosted: true);
+    print('Información de contacto correctamente.');
+  }
+
+  _touchFieldsEventContact(){
+    final contactName = CompanyName.dirty(value: state.contactName.value);
+    final contactEmail = Email.dirty(value: state.contactEmail.value);
+    final contactPhone = Phone.dirty(value: state.contactPhone.value);
+    final webpage = SocialMedia.dirty(value: state.webpage?.value ?? '');
+    final instagram = SocialMedia.dirty(value: state.instagram?.value ?? '');
+    final facebook = SocialMedia.dirty(value: state.facebook?.value ?? '');
+    final youtube = SocialMedia.dirty(value: state.youtube?.value ?? '');
+    final linkedin = SocialMedia.dirty(value: state.linkedin?.value ?? '');
+    
+
+    state = state.copyWith(
+      isEventContactPosted: true,
+      contactName: contactName,
+      contactEmail: contactEmail,
+      contactPhone: contactPhone,
+      webpage: webpage,
+      instagram: instagram,
+      facebook: facebook,
+      youtube: youtube,
+      linkedin: linkedin,
+
+      isValid: Formz.validate([
+        contactName, 
+        contactEmail, 
+        contactPhone, 
+        webpage,
+        instagram,
+        facebook,
+        youtube,
+        linkedin,
+      ])      
+    ); 
+  }
+
+  
+}
 
 class EventFormState {
   final bool isPosting;
   final bool isFormPosted;
   final bool isEventInfoPosted;
+  final bool isEventIncriptionPosted;
+  final bool isEventAgendaPosted;
+  final bool isEventContactPosted;
   final bool isValid;
   final EventName name;
   final Description description;
@@ -859,26 +1079,29 @@ class EventFormState {
   final bool isPublic;
   final VenueCapacity capacity;
   final InscriptionCost inscriptionCost;
-  final List<String> paymentMethods;
+  final PaymentMethods paymentMethods;
   final List<AgendaDay> agenda;
-  final String? informacionAdicional;
-  final List<String>? documentosAdjuntos;
+  final AdditionalInfo? additionalInfo;
+  final List<String>? attachedDocument;
   final bool restriccionEdad;
-  final String nameContacto;
-  final String telefonoContacto;
-  final String emailContacto;
-  final String? webpage;
-  final String? instagram;
-  final String? facebook;
-  final String? youtube;
-  final String? linkedin;
+  final CompanyName contactName;
+  final Phone contactPhone;
+  final Email contactEmail;
+  final SocialMedia? webpage;
+  final SocialMedia? instagram;
+  final SocialMedia? facebook;
+  final SocialMedia? youtube;
+  final SocialMedia? linkedin;
 
 
   EventFormState({
     this.isPosting = false,
     this.isFormPosted = false,
     this.isEventInfoPosted = false,
-    this.isValid = false,
+    this.isEventIncriptionPosted = false,
+    this.isEventAgendaPosted = false,
+    this.isEventContactPosted = false,
+    this.isValid = false, 
     this.name = const EventName.pure(),
     this.description = const Description.pure(),
     this.startDate = const StartDate.pure(),
@@ -897,25 +1120,28 @@ class EventFormState {
     this.isPublic = true,
     this.capacity = const VenueCapacity.pure(),
     this.inscriptionCost = const InscriptionCost.pure(),
-    this.paymentMethods = const [],
+    this.paymentMethods = const PaymentMethods.pure(),
     this.agenda = const [],
-    this.informacionAdicional,
-    this.documentosAdjuntos,
+    this.additionalInfo = const AdditionalInfo.pure(),
+    this.attachedDocument,
     this.restriccionEdad = false,
-    this.nameContacto = '',
-    this.telefonoContacto = '',
-    this.emailContacto = '',
-    this.webpage = '', 
-    this.instagram = '', 
-    this.facebook = '', 
-    this.youtube = '',
-    this.linkedin = '',
+    this.contactName = const CompanyName.pure(),
+    this.contactPhone = const Phone.pure(),
+    this.contactEmail = const Email.pure(),
+    this.webpage = const SocialMedia.pure(), 
+    this.instagram = const SocialMedia.pure(), 
+    this.facebook = const SocialMedia.pure(), 
+    this.youtube = const SocialMedia.pure(),
+    this.linkedin = const SocialMedia.pure(),
   });
 
   EventFormState copyWith({
     bool? isPosting,
     bool? isFormPosted,
     bool? isEventInfoPosted,
+    bool? isEventIncriptionPosted,
+    bool? isEventAgendaPosted,
+    bool? isEventContactPosted,
     bool? isValid,
     EventName? name,
     Description? description,
@@ -935,23 +1161,26 @@ class EventFormState {
     bool? isPublic,
     VenueCapacity? capacity,
     InscriptionCost? inscriptionCost,
-    List<String>? paymentMethods,
+    PaymentMethods? paymentMethods,
     List<AgendaDay>? agenda,
-    String? informacionAdicional,
-    List<String>? documentosAdjuntos,
+    AdditionalInfo? additionalInfo,
+    List<String>? attachedDcoment,
     bool? restriccionEdad,
-    String? nameContacto,
-    String? telefonoContacto,
-    String? emailContacto,
-    String? webpage,
-    String? instagram,
-    String? facebook,
-    String? youtube,
-    String? linkedin, 
+    CompanyName? contactName,
+    Phone? contactPhone,
+    Email? contactEmail,
+    SocialMedia? webpage,
+    SocialMedia? instagram,
+    SocialMedia? facebook,
+    SocialMedia? youtube,
+    SocialMedia? linkedin, 
   }) => EventFormState(
     isPosting: isPosting ?? this.isPosting,
     isFormPosted: isFormPosted ?? this.isFormPosted,
     isEventInfoPosted: isEventInfoPosted ?? this.isEventInfoPosted,
+    isEventIncriptionPosted: isEventIncriptionPosted ?? this.isEventIncriptionPosted,
+    isEventAgendaPosted: isEventAgendaPosted ?? this.isEventAgendaPosted,
+    isEventContactPosted: isEventContactPosted ?? this.isEventContactPosted,
     isValid: isValid ?? this.isValid,
     name: name ?? this.name,
     description: description ?? this.description,
@@ -973,12 +1202,12 @@ class EventFormState {
     inscriptionCost: inscriptionCost ?? this.inscriptionCost,
     paymentMethods: paymentMethods ?? this.paymentMethods,
     agenda: agenda ?? this.agenda,
-    informacionAdicional: informacionAdicional ?? this.informacionAdicional,
-    documentosAdjuntos: documentosAdjuntos ?? this.documentosAdjuntos,
+    additionalInfo: additionalInfo ?? this.additionalInfo,
+    attachedDocument: attachedDcoment ?? this.attachedDocument,
     restriccionEdad: restriccionEdad ?? this.restriccionEdad,
-    nameContacto: nameContacto ?? this.nameContacto,
-    telefonoContacto: telefonoContacto ?? this.telefonoContacto,
-    emailContacto: emailContacto ?? this.emailContacto,
+    contactName: contactName ?? this.contactName,
+    contactPhone: contactPhone ?? this.contactPhone,
+    contactEmail: contactEmail ?? this.contactEmail,
     webpage: webpage ?? this.webpage,
     instagram:  instagram ?? this.instagram,
     facebook : facebook ?? this.facebook,
@@ -986,3 +1215,5 @@ class EventFormState {
     linkedin : linkedin ?? this.linkedin,
   );
 }
+
+

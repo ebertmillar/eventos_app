@@ -10,6 +10,7 @@ class DatosContactoScreen extends ConsumerWidget{
   Widget build(BuildContext context, WidgetRef ref) {
 
     final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+    final eventFormState = ref.watch(createEventFormProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,6 +28,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: 'Organizador',
           hint: 'Nombre del organizador o empresa',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.contactName.errorMessage,
           controller: eventFormNotifier.contactNameController,
           onChanged: eventFormNotifier.onContactNameChanged,
 
@@ -36,6 +38,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: 'Email',
           hint: 'Email del responsable del evento',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.contactEmail.errorMessage,
           controller: eventFormNotifier.contactEmailController,
           onChanged: eventFormNotifier.onContactEmailChanged,
         ),
@@ -43,6 +46,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: 'Teléfono de contacto',
           hint: 'Teléfono del responsable del evento',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.contactPhone.errorMessage,
           controller: eventFormNotifier.contactPhoneController,
           onChanged: eventFormNotifier.onContactPhoneChanged,
         ),
@@ -50,6 +54,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: 'Página web',
           hint: 'Añade URL del evento',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.webpage?.errorMessage ,
           controller: eventFormNotifier.webpageController,
           onChanged: eventFormNotifier.onWebpageChanged,
           
@@ -58,6 +63,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: '¿Tienes Instagram?',
           hint: 'Añade tu @user o URL',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.instagram?.errorMessage ,
           controller: eventFormNotifier.instagramController,
           onChanged: eventFormNotifier.onInstagramChanged,
         ),
@@ -65,6 +71,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: '¿Tienes Facebook?',
           hint: 'Añade tu @user o URL',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.facebook?.errorMessage ,
           controller: eventFormNotifier.facebookController,
           onChanged: eventFormNotifier.onFacebookChanged,
         ),
@@ -72,6 +79,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: '¿Tienes Youtube?',
           hint: 'Añade tu @user o URL',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.youtube?.errorMessage ,
           controller: eventFormNotifier.youtubeController,
           onChanged: eventFormNotifier.onYouTubeChanged,
         ),
@@ -79,6 +87,7 @@ class DatosContactoScreen extends ConsumerWidget{
           label: '¿Tienes Linkedin?',
           hint: 'Añade tu @user o URL',
           keyboardType: TextInputType.text,
+          errorMessage: eventFormState.linkedin?.errorMessage ,
           controller: eventFormNotifier.linkedinController,
           onChanged: eventFormNotifier.onLinkedInChanged,
         ),

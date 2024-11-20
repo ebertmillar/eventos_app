@@ -68,6 +68,7 @@ class AgendaFormScreen extends ConsumerWidget {
             hint: 'Añade toda la información adicional como comida, transporte, etc.',
             maxLines: 4,
             controller: eventFormNotifier.additionalInfoController,
+            errorMessage: eventFormState.isEventAgendaPosted ? eventFormState.additionalInfo?.errorMessage : null, 
             onChanged: eventFormNotifier.onAdditionalInfoChanged,
           ),
 
@@ -87,7 +88,7 @@ class AgendaFormScreen extends ConsumerWidget {
 
   bool _validateEventDates(BuildContext context, WidgetRef ref) {
     final eventFormState = ref.read(createEventFormProvider);
-    if (eventFormState.startDate == null || eventFormState.endDate == null) {
+    if (eventFormState.startDate.value == null || eventFormState.endDate.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Primero debes seleccionar una fecha de inicio y fin del evento.')),
       );
@@ -95,6 +96,8 @@ class AgendaFormScreen extends ConsumerWidget {
     }
     return true;
   }
+
+  
 
 void _showAddDayDialog(BuildContext context, WidgetRef ref) async {
   final eventFormState = ref.read(createEventFormProvider);

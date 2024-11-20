@@ -2,6 +2,7 @@ import 'package:eventos_app/domain/entities/entities.dart';
 import 'package:flutter/material.dart';
 
 class Event {
+  
   // Detalles del Evento
   final String name; // Nombre oficial del evento
   final String description; // Descripción breve del evento

@@ -1,4 +1,4 @@
-import 'package:eventos_app/features/events/domain/entities/agenda_day.dart';
+import 'package:eventos_app/features/events/domain/entities/activity.dart';
 import 'package:eventos_app/shared/helpers/date_picker_helper.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';

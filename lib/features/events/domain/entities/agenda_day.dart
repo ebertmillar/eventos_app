@@ -1,3 +1,5 @@
+import 'package:eventos_app/features/events/domain/entities/activity.dart';
+
 class AgendaDay {
   final String day;
   final DateTime date; // Asegúrate de incluir este campo
@@ -22,28 +24,4 @@ class AgendaDay {
   }
 }
 
-
-class Activity {
-  final String startTime; // Hora de inicio de la actividad
-  final String endTime; // Hora de fin de la actividad
-  final String description; // 
-  
-  Activity({
-    required this.startTime,
-    required this.endTime,
-    required this.description,
-  });
-
-  Activity copyWith({
-    String? startTime,
-    String? endTime,
-    String? description,
-  }) {
-    return Activity(
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
-      description: description ?? this.description,
-    );
-  }
-}
 

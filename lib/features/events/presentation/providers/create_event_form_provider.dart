@@ -1,6 +1,7 @@
 
 import 'dart:io';
 import 'package:eventos_app/features/auth/domain/entities/entities.dart';
+import 'package:eventos_app/features/events/domain/entities/activity.dart';
 import 'package:eventos_app/features/events/enum/payment_method.dart';
 import 'package:eventos_app/shared/helpers/date_time_formatters.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';

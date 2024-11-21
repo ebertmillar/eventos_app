@@ -1,9 +1,10 @@
 import 'package:eventos_app/features/auth/domain/entities/entities.dart';
 import 'package:flutter/material.dart';
 
-class Event {
-  
+class Event {  
   // Detalles del Evento
+  final String id;
+  final String createdBy;
   final String name; // Nombre oficial del evento
   final String description; // Descripción breve del evento
   final DateTime startDate; // Fecha de inicio del evento
@@ -12,7 +13,7 @@ class Event {
   final TimeOfDay endTime; // Hora de fin del evento
   final bool differentSchedulesPerDay; // Indica si cada día tiene un horario diferente
   final String location; // Dirección física o enlace de reunión virtual
-  final String? headerImage; // URL de la imagen de cabecera (opcional)
+  final String headerImage; // URL de la imagen de cabecera (opcional)
   
   // Detalles de Inscripción
   final DateTime inscriptionStartDate; // Fecha de inicio de la inscripción
@@ -44,7 +45,11 @@ class Event {
   final String? youtube; // YouTube del evento
   final String? linkedin; // LinkedIn del evento
 
+  final DateTime createdAt;
+
   Event({
+    required this.id,
+    required this.createdBy,
     required this.name,
     required this.description,
     required this.startDate,
@@ -53,7 +58,7 @@ class Event {
     required this.endTime,
     required this.differentSchedulesPerDay,
     required this.location,
-    this.headerImage, // Opcional
+    required this.headerImage,
     required this.inscriptionStartDate,
     required this.inscriptionEndDate,
     required this.inscriptionStartTime,
@@ -63,8 +68,8 @@ class Event {
     required this.inscriptionCost,
     required this.paymentMethods,
     required this.agenda,
-    this.additionalInformation = '', // Valor predeterminado para evitar nulos
-    this.attachedDocuments = const [], // Lista vacía por defecto
+    this.additionalInformation = '',
+    this.attachedDocuments = const [], 
     required this.ageRestriction,
     required this.contactName,
     required this.contactPhone,
@@ -74,6 +79,7 @@ class Event {
     this.facebook,
     this.youtube,
     this.linkedin,
+    required this.createdAt,
   });
 
 }

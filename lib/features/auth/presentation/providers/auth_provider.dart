@@ -103,6 +103,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     state = state.copyWith(
     user: user,
     authStatus: AuthStatus.authenticated,
+    idToken: idToken,
     errorMessage: '',
     );
   }
@@ -139,21 +140,25 @@ class AuthProvider {
   final AuthStatus authStatus;
   final User? user;
   final String errorMessage;
+  final String idToken;
 
   AuthProvider({
     this.authStatus = AuthStatus.checking, 
     this.user, 
     this.errorMessage ='',
+    this.idToken='',
     });
 
   AuthProvider copyWith({
     AuthStatus? authStatus,
     User? user,
     String? errorMessage,
+    String? idToken,
   }) => AuthProvider(
     authStatus: authStatus ?? this.authStatus,
     user: user ?? this.user,
     errorMessage: errorMessage ?? this.errorMessage,
+    idToken: idToken ?? this.idToken,
   );
   
 

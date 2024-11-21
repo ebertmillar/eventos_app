@@ -1,6 +1,18 @@
 
-import 'package:eventos_app/features/auth/domain/entities/entities.dart';
-import 'package:flutter/material.dart';
+
+import 'package:eventos_app/features/events/domain/domain.dart';
+
+abstract class EventDatasource {
+
+  Future<List<Event>> getEventByPage({ int limit = 10, int offset = 0});
+
+  Future<Event> getEventById(String id);
+
+  Future<Event> createUpdateEvent(Map<String,dynamic> eventLike);
+
+  Future<void> deleteEvent(String id);
+
+}
 
 
 

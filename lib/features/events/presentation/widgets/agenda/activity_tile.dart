@@ -1,5 +1,5 @@
+import 'package:eventos_app/features/events/domain/entities/activity.dart';
 import 'package:flutter/material.dart';
-import 'package:eventos_app/features/events/domain/entities/agenda_day.dart';
 
 class ActivityTile extends StatelessWidget {
   final Activity activity;

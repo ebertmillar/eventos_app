@@ -1,7 +1,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:eventos_app/core/config/config.dart';
-import 'package:eventos_app/features/events/domain/domain.dart';
+import 'package:eventos_app/features/events/domain/domian.dart';
 import 'package:eventos_app/features/events/infrastructure/mappers/event_mapper.dart';
 
 class EventDatasourceImpl extends EventDatasource {

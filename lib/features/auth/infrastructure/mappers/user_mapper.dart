@@ -17,7 +17,7 @@ class UserMapper {
       isActive: json["isActive"] ?? false,
       aceptaTerminos: json["aceptaTerminos"] ?? false,
       aceptaComunicaciones: json["aceptaComunicaciones"] ?? false,
-      token: json["token"] ?? '',
+      token: json["token"],
     );
   }
 

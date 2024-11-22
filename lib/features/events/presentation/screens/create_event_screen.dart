@@ -5,6 +5,7 @@ import 'package:eventos_app/features/events/presentation/screens/agenda_form_scr
 import 'package:eventos_app/features/events/presentation/screens/datos_contacto_screen.dart';
 import 'package:eventos_app/features/events/presentation/screens/datos_del_evento_form.dart';
 import 'package:eventos_app/features/events/presentation/screens/incripciones_form.dart';
+import 'package:eventos_app/shared/shared.dart';
 import 'package:eventos_app/shared/widgets/custom_appbar.dart';
 import 'package:eventos_app/shared/widgets/custom_filled_button.dart';
 import 'package:eventos_app/shared/widgets/custom_outline_button.dart';
@@ -245,6 +246,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const CustomNavigationbar(),
     );
   }
 }

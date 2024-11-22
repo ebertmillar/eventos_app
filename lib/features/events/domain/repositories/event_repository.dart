@@ -1,6 +1,6 @@
 
 
-import 'package:eventos_app/features/events/domain/domain.dart';
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 
 abstract class EventRepository{
 

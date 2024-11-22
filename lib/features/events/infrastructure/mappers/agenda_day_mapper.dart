@@ -7,7 +7,9 @@ class AgendaDayMapper {
     // Mapear solo los campos presentes en la respuesta del servidor
     return AgendaDay(
       day: json['day'],
-      date: DateTime.parse(json['date']),
+      date: json['date'] != null 
+        ? DateTime.parse(json['date']) 
+        : DateTime.now(),
       activities: List<Activity>.from(
         json['activities'].map((activity) => ActivityMappers.jsonToEntity(activity)),
       ), 

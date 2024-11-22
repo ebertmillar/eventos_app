@@ -41,7 +41,7 @@ class RegisterUserScreen extends StatelessWidget {
 
             SizedBox(
               width: double.infinity,
-              child: const _RegisterForm(),
+              child: _RegisterForm(),
             ),
 
           ],
@@ -158,7 +158,6 @@ class _RegisterForm extends ConsumerWidget {
 
               Expanded(
                 flex: 2,
-                
                 child: CustomTextFormField(
                   onChanged: (value) => ref.read(registerFormProvider.notifier).onTelefonoChanged(value),
                   keyboardType: TextInputType.phone,

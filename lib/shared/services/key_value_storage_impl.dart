@@ -14,7 +14,7 @@ class KeyValueServiceImpl extends KeyValueStorage {
     if (T == int) {
       return prefs.getInt(key) as T;
     } else if (T == String) {
-      return prefs.getString(key) as T;
+      return (prefs.getString(key) ?? '') as T;
     } else {
       throw UnimplementedError('No está implementado para el tipo de dato : ${T.runtimeType}');
     }

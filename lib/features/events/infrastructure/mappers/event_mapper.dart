@@ -1,5 +1,7 @@
-import 'package:eventos_app/features/events/domain/domain.dart';
+import 'package:eventos_app/features/events/domain/entities/agenda_day.dart';
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/features/events/infrastructure/mappers/agenda_day_mapper.dart';
+import 'package:eventos_app/shared/helpers/parse_time_of_day.dart';
 
 class EventMapper {
 
@@ -12,15 +14,19 @@ class EventMapper {
       description: json["description"],
       startDate: DateTime.parse(json["startDate"]),
       endDate: DateTime.parse(json["endDate"]),
-      startTime: json["startTime"],
-      endTime: json["endTime"],
+      startTime: parseTimeOfDay(json["startTime"]),
+      endTime: parseTimeOfDay(json["endTime"]),
       differentSchedulesPerDay: json["differentSchedulesPerDay"] ?? false,
-      location: json["location"],
+      location: json["location"] ?? '',
       headerImage: json["headerImage"] ?? '',
-      inscriptionStartDate: DateTime.parse(json["inscriptionStartDate"]),
-      inscriptionEndDate: DateTime.parse(json["inscriptionEndDate"]),
-      inscriptionStartTime: json["inscriptionStartTime"],
-      inscriptionEndTime: json["inscriptionEndTime"],
+      inscriptionStartDate: json["inscriptionStartDate"] != null 
+        ? DateTime.parse(json["inscriptionStartDate"])
+        : DateTime.now(),
+      inscriptionEndDate: json["inscriptionEndDate"] != null 
+        ? DateTime.parse(json["inscriptionEndDate"])
+        : DateTime.parse(json["startDate"]),
+      inscriptionStartTime: parseTimeOfDay(json["inscriptionStartTime"]),
+      inscriptionEndTime: parseTimeOfDay(json["inscriptionEndTime"]),
       isPublic: json["isPublic"] ?? true,
       capacity: json["capacity"],
       inscriptionCost: double.parse(json["inscriptionCost"].toString()),

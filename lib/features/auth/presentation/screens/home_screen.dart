@@ -1,15 +1,40 @@
 
+import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
+import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  HomeViewState createState() => HomeViewState();
+
+
+}
+
+class HomeViewState extends ConsumerState{
+
+  @override
+  void initState() {
+    super.initState();
+    //ref.read(eventsProvider.notifier).loadNextPage();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
 
     final textTheme = Theme.of(context).textTheme;
+
+    final eventsState = ref.watch(eventsProvider);
 
     return Scaffold(
       appBar: const CustomAppbar(),
@@ -98,8 +123,9 @@ class HomeScreen extends ConsumerWidget {
               
               Expanded(
                 child: ListView.builder(
-                  itemCount: 4, /// hacer length para determinar la cantidad de eventos a mostrar
+                  itemCount: eventsState.events.length, /// hacer length para determinar la cantidad de eventos a mostrar
                   itemBuilder: (context, index) {
+                    final event = eventsState.events[index];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -124,35 +150,45 @@ class HomeScreen extends ConsumerWidget {
                         //Nombre Evento
                         SizedBox(
                           width: 360,
-                          child: Text(
-                            'Nombre del Evento',
-                            maxLines: 2,
-                            style: textTheme.bodyLarge?.copyWith(color: Colors.black , fontWeight: FontWeight.bold, fontSize: 20)                        
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child: Text(
+                              event.name,
+                              maxLines: 2,
+                              style: textTheme.labelSmall?.copyWith(color: Colors.black , fontWeight: FontWeight.bold, fontSize: 20)                        
+                            ),
                           ),
                         ),
         
                         //Fecha y lugar del evento
         
                         SizedBox(
-                          width: 360,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Fecha del evento', 
-                                style: textTheme.bodyLarge?.copyWith(color: Colors.amber , fontWeight: FontWeight.bold),
-                              ),
-        
-                              Text(
-                                'Lugar del evento', 
-                                style: textTheme.bodyLarge?.copyWith(color: Colors.black45),
-                              ),
-        
-                            ],
+                          width: double.infinity,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    formatDateRange(event.startDate, event.endDate),
+                                    style: textTheme.bodyMedium?.copyWith(color: Colors.orange.shade500 , fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    event.location, 
+                                    style: textTheme.bodyMedium?.copyWith(color: Colors.black45),
+                                  ),
+                                ),
+                                    
+                              ],
+                            ),
                           ),
                         ),
         
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
                       ],
                     );
                   },

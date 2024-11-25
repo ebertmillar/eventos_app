@@ -5,6 +5,7 @@ import 'package:eventos_app/features/events/presentation/screens/create_event_sc
 import 'package:eventos_app/features/auth/presentation/screens/home_screen.dart';
 import 'package:eventos_app/features/auth/presentation/screens/register_user_screen.dart';
 import 'package:eventos_app/features/auth/presentation/screens/splash_screen.dart';
+import 'package:eventos_app/features/events/presentation/screens/event_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -35,6 +36,13 @@ final goRouterProvider = Provider((ref) {
       GoRoute(
         path: '/create-event',
         builder: (context, state) => const CreateEventScreen(), 
+      ),
+      GoRoute(
+        path: '/event/:id',
+        builder: (context, state) => EventScreen(
+          eventId: state.pathParameters['id'] ?? 'no-id',
+          
+        ), 
       ),
     ],
     redirect: (context, state) {

@@ -62,6 +62,6 @@ int getIndexFromLocation(String location) {
   if (location == '/') return 0;
   if (location == '/search') return 1;
   if (location == '/my-tickets') return 2;
-  if (location == '/create-event') return 3;
+  if (location == '/create-event' || location =='/register') return 3;
   return -1; // Si la ruta no pertenece al BottomNavigationBar
 }

@@ -2,9 +2,9 @@
 
 import 'package:eventos_app/features/events/domain/domain.dart';
 
-class EventRepositoyImpl extends EventRepository{
+class EventRepositoyImpl extends EventsRepository{
 
-  final EventDatasource datasource;
+  final EventsDatasource datasource;
 
   EventRepositoyImpl(this.datasource);
 

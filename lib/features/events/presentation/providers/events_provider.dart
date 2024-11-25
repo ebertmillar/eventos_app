@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final eventsProvider = StateNotifierProvider<EventsNotifier,EventsState>((ref) {
   
-  final eventsRepository = ref.read(eventRepositoryProvider);
+  final eventsRepository = ref.read(eventsRepositoryProvider);
   
   return EventsNotifier(eventsRepository: eventsRepository);
 
@@ -17,7 +17,7 @@ final eventsProvider = StateNotifierProvider<EventsNotifier,EventsState>((ref) {
 
 class EventsNotifier extends StateNotifier<EventsState> {
 
-  final EventRepository eventsRepository;
+  final EventsRepository eventsRepository;
 
   EventsNotifier({
     required this.eventsRepository

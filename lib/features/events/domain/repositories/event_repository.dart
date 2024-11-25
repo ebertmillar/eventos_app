@@ -2,7 +2,7 @@
 
 import 'package:eventos_app/features/events/domain/entities/event.dart';
 
-abstract class EventRepository{
+abstract class EventsRepository{
 
   Future<List<Event>> getEventByPage({ int limit = 10, int offset = 0});
 

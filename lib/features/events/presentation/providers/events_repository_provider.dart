@@ -4,7 +4,7 @@ import 'package:eventos_app/features/events/infrastructure/datasources/event_dat
 import 'package:eventos_app/features/events/infrastructure/repositories/event_repositoy_impl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final eventRepositoryProvider = Provider<EventRepositoyImpl>((ref){
+final eventsRepositoryProvider = Provider<EventRepositoyImpl>((ref){
 
   final accessToken = ref.watch(authProvider).idToken;
 

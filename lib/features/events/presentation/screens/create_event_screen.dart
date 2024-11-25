@@ -1,19 +1,19 @@
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
+import 'package:eventos_app/features/events/presentation/providers/event_provider.dart';
 import 'package:eventos_app/features/events/presentation/providers/step_provider.dart';
 import 'package:eventos_app/features/events/presentation/screens/agenda_form_screen.dart';
 import 'package:eventos_app/features/events/presentation/screens/datos_contacto_screen.dart';
 import 'package:eventos_app/features/events/presentation/screens/datos_del_evento_form.dart';
 import 'package:eventos_app/features/events/presentation/screens/incripciones_form.dart';
 import 'package:eventos_app/shared/shared.dart';
-import 'package:eventos_app/shared/widgets/custom_appbar.dart';
-import 'package:eventos_app/shared/widgets/custom_filled_button.dart';
 import 'package:eventos_app/shared/widgets/custom_outline_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class CreateEventScreen extends ConsumerStatefulWidget {
+
   const CreateEventScreen({super.key});
 
   @override
@@ -22,6 +22,12 @@ class CreateEventScreen extends ConsumerStatefulWidget {
 
 class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   final ScrollController _scrollController = ScrollController();
+  
+  @override
+  void initState() {
+    super.initState();
+    //ref.read(eventProvider(widget.eventId).notifier);
+  }
 
   @override
   void dispose() {
@@ -246,7 +252,6 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomNavigationbar(),
     );
   }
 }

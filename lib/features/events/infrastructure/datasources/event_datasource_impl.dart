@@ -2,9 +2,10 @@
 import 'package:dio/dio.dart';
 import 'package:eventos_app/core/config/config.dart';
 import 'package:eventos_app/features/events/domain/domian.dart';
+import 'package:eventos_app/features/events/domain/errors/events_errors.dart';
 import 'package:eventos_app/features/events/infrastructure/mappers/event_mapper.dart';
 
-class EventDatasourceImpl extends EventDatasource {
+class EventDatasourceImpl extends EventsDatasource {
 
   late final Dio dio;
   final String accessToken;
@@ -33,9 +34,36 @@ class EventDatasourceImpl extends EventDatasource {
   }
 
   @override
-  Future<Event> getEventById(String id) {
-    // TODO: implement getEventById
-    throw UnimplementedError();
+  Future<Event> getEventById(String id) async {
+    try {
+      
+      final response = await dio.get('/api/events/$id');
+      final event = EventMapper.jsonToEntity(response.data);
+      return event;
+
+    } on DioException catch (dioError) {
+      // Manejar errores específicos de Dio
+      if (dioError.type == DioExceptionType.connectionTimeout) {
+        throw ConnectionTimeout();
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        throw ConnectionTimeout('Tiempo de espera agotado al recibir datos');
+      } else if (dioError.type == DioExceptionType.badResponse) {
+        final statusCode = dioError.response?.statusCode;
+        if (statusCode == 401) {
+          throw UnauthorizedAccess();
+        } else if (statusCode == 404) {
+          throw EventNotFound();
+        } else if (statusCode == 400) {
+          throw BadRequest();
+        } else {
+          throw ServerError('Error en la respuesta del servidor: Código $statusCode');
+        }
+      } else {
+        throw UnknownError('Error de red desconocido: ${dioError.message}');
+      }
+    } catch (e) {
+      throw UnknownError('Ocurrió un error inesperado: $e');
+    }
   }
 
   @override

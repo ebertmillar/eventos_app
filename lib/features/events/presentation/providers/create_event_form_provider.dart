@@ -3,6 +3,7 @@ import 'package:eventos_app/features/auth/domain/entities/entities.dart';
 import 'package:eventos_app/features/events/domain/entities/activity.dart';
 import 'package:eventos_app/features/events/enum/payment_method.dart';
 import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
+import 'package:eventos_app/features/events/presentation/providers/events_repository_provider.dart';
 import 'package:eventos_app/shared/helpers/date_time_formatters.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/shared/helpers/parse_time_of_day.dart';
@@ -44,6 +45,7 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
     required Event event
   }) : super(EventFormState(
         id: event.id,
+        createdBy: event.createdBy,
         name :EventName.dirty(value: event.name),
         description :Description.dirty(value: event.description), 
         startDate :StartDate.dirty(value: event.startDate), 
@@ -954,6 +956,7 @@ void removeActivity(String dia, int index) {
 
     final eventLike = {
       'id': (state.id == 'new') ? null : state.id,
+      'createdBy': state.createdBy,
       'name': state.name.value,
       'description': state.description.value,
       'startDate': state.startDate.value?.toIso8601String(),
@@ -1175,6 +1178,7 @@ class EventFormState {
   final bool isEventContactPosted;
   final bool isValid;
   final String? id;
+  final String createdBy;
   final EventName name;
   final Description description;
   final StartDate startDate;
@@ -1217,6 +1221,7 @@ class EventFormState {
     this.isEventContactPosted = false,
     this.isValid = false, 
     this.id,
+    this.createdBy = '',
     this.name = const EventName.pure(),
     this.description = const Description.pure(),
     this.startDate = const StartDate.pure(),
@@ -1259,6 +1264,7 @@ class EventFormState {
     bool? isEventContactPosted,
     bool? isValid,
     String? id,
+    String? createdBy,
     EventName? name,
     Description? description,
     StartDate? startDate,
@@ -1299,6 +1305,7 @@ class EventFormState {
     isEventContactPosted: isEventContactPosted ?? this.isEventContactPosted,
     isValid: isValid ?? this.isValid,
     id: id ?? this.id,
+    createdBy: createdBy ?? this.createdBy,
     name: name ?? this.name,
     description: description ?? this.description,
     startDate: startDate ?? this.startDate,

@@ -1,5 +1,6 @@
 
 
+import 'package:eventos_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/features/events/domain/domain.dart';
 import 'package:eventos_app/features/events/presentation/providers/events_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,8 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final eventsProvider = StateNotifierProvider<EventsNotifier,EventsState>((ref) {
   
   final eventsRepository = ref.read(eventsRepositoryProvider);
+  final currentUserId = ref.read(authProvider).currentUserId;
   
-  return EventsNotifier(eventsRepository: eventsRepository);
+  return EventsNotifier(eventsRepository: eventsRepository, currentUserId: currentUserId,);
 
 });
 
@@ -18,9 +20,11 @@ final eventsProvider = StateNotifierProvider<EventsNotifier,EventsState>((ref) {
 class EventsNotifier extends StateNotifier<EventsState> {
 
   final EventsRepository eventsRepository;
+  final String? currentUserId;  // Recibimos el currentUserId
 
   EventsNotifier({
-    required this.eventsRepository
+    required this.eventsRepository,
+    required this.currentUserId,
   }) :super(EventsState()){
     loadNextPage();
   }
@@ -28,6 +32,12 @@ class EventsNotifier extends StateNotifier<EventsState> {
   Future<bool> createOrUpdateEvent(Map<String,dynamic> eventLike) async {
 
     try {
+
+      // Si no tiene 'createdBy', asignamos el ID del usuario actual
+      if (!eventLike.containsKey('createdBy')) {
+        eventLike['createdBy'] = currentUserId;  // Asignamos el currentUserId al campo 'createdBy'
+      }
+      
       final event = await eventsRepository.createUpdateEvent(eventLike);
       final isEventInList = state.events.any(( element )=> element.id == event.id  );
 
@@ -37,6 +47,7 @@ class EventsNotifier extends StateNotifier<EventsState> {
         );
         return true;
       }
+      
 
       state = state.copyWith(
         events: state.events.map(

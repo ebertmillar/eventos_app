@@ -98,6 +98,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
       state = state.copyWith(
         authStatus: AuthStatus.authenticated,
         idToken: idToken,
+        currentUserId: currentUser.uid, 
       );
     } catch (e) {
       print('Error al verificar el estado de autenticación: $e');
@@ -124,6 +125,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     user: user,
     authStatus: AuthStatus.authenticated,
     idToken: idToken,
+    currentUserId: user.id,
     errorMessage: '',
     );
   }
@@ -146,6 +148,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
       authStatus: AuthStatus.notAuthenticated,
       user: null,
       errorMessage: errorMessage,
+      currentUserId: null,
     );
 
   }
@@ -161,12 +164,14 @@ class AuthProvider {
   final User? user;
   final String errorMessage;
   final String idToken;
+  final String? currentUserId;
 
   AuthProvider({
     this.authStatus = AuthStatus.checking, 
     this.user, 
     this.errorMessage ='',
     this.idToken='',
+    this.currentUserId,  
     });
 
   AuthProvider copyWith({
@@ -174,11 +179,13 @@ class AuthProvider {
     User? user,
     String? errorMessage,
     String? idToken,
+    String? currentUserId,
   }) => AuthProvider(
     authStatus: authStatus ?? this.authStatus,
     user: user ?? this.user,
     errorMessage: errorMessage ?? this.errorMessage,
     idToken: idToken ?? this.idToken,
+    currentUserId: currentUserId ?? this.currentUserId,
   );
   
 

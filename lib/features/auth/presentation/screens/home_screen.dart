@@ -1,4 +1,5 @@
 
+import 'package:eventos_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/shared/shared.dart';
@@ -42,8 +43,8 @@ class HomeViewState extends ConsumerState{
   Widget build(BuildContext context) {
 
     final textTheme = Theme.of(context).textTheme;
-
     final eventsState = ref.watch(eventsProvider);
+    final currentUserId = ref.watch(authProvider).currentUserId;
 
     return Scaffold(
       appBar: const CustomAppbar(),
@@ -139,6 +140,8 @@ class HomeViewState extends ConsumerState{
                   itemCount: eventsState.events.length, /// hacer length para determinar la cantidad de eventos a mostrar
                   itemBuilder: (context, index) {
                     final event = eventsState.events[index];
+                    final isCreator = currentUserId == event.createdBy;
+
                     return GestureDetector(
                       onTap: () => context.push('/event/${ event.id}'),
                       child: Column(
@@ -211,12 +214,13 @@ class HomeViewState extends ConsumerState{
                               ],
                             ),
                           ),
-                          IconButton(
-                            onPressed: (){
-                              final event = eventsState.events[index];
-                                context.push('/create-event/${ event.id}');
-                            }, 
-                            icon: const Icon(Icons.edit)),
+                          if (isCreator) 
+                            IconButton(
+                              onPressed: () {
+                                context.push('/create-event/${event.id}');
+                              },
+                              icon: const Icon(Icons.edit),
+                            ),
 
                           const SizedBox(height: 30),
                         ],

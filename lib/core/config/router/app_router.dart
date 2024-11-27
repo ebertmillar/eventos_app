@@ -6,6 +6,7 @@ import 'package:eventos_app/features/auth/presentation/screens/home_screen.dart'
 import 'package:eventos_app/features/auth/presentation/screens/register_user_screen.dart';
 import 'package:eventos_app/features/auth/presentation/screens/splash_screen.dart';
 import 'package:eventos_app/features/events/presentation/screens/event_screen.dart';
+import 'package:eventos_app/features/events/presentation/screens/tickets_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -30,6 +31,10 @@ final goRouterProvider = Provider((ref) {
         builder: (context, state) => const RegisterUserScreen(),
       ),
       GoRoute(
+        path: '/my-tickets',
+        builder: (context, state) => const TicketsScreen(),
+      ),
+      GoRoute(
         path: '/',
         builder: (context, state) => const HomeScreen(),
       ),
@@ -45,6 +50,7 @@ final goRouterProvider = Provider((ref) {
           eventId: state.pathParameters['id'] ?? 'no-id',
         ), 
       ),
+
       GoRoute(
         path: '/event/:id',
         builder: (context, state) => EventScreen(
@@ -63,7 +69,7 @@ final goRouterProvider = Provider((ref) {
 
       if (authStatus == AuthStatus.notAuthenticated) {
         if (isGoingTo == '/checking') return '/';
-        if (isGoingTo == '/create-event' ) return '/register';
+        if (isGoingTo.startsWith('/create-event')) return '/register'; // Redirige al registro si no está autenticado
       }
 
       if( authStatus == AuthStatus.authenticated){

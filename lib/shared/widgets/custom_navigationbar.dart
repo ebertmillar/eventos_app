@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventos_app/features/auth/presentation/providers/auth_provider.dart';
 
-class CustomNavigationbar extends StatefulWidget {
-  const CustomNavigationbar({super.key});  
+class CustomNavigationbar extends ConsumerWidget {
+  const CustomNavigationbar({super.key});
 
   @override
-  CustomNavigationbarState createState() => CustomNavigationbarState();
-  
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Acceder al estado actual de autenticación
+    final authStatus = ref.watch(authProvider).authStatus;
 
-class CustomNavigationbarState extends State<CustomNavigationbar> {
-  // Controla el índice actual
-  
-  @override
-  Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     final currentIndex = getIndexFromLocation(location);
 
@@ -50,7 +47,11 @@ class CustomNavigationbarState extends State<CustomNavigationbar> {
             context.go('/my-tickets');
             break;
           case 3:
-            context.go('/create-event');
+            if (authStatus == AuthStatus.authenticated) {
+              context.go('/create-event/new');
+            } else {
+              context.go('/register');
+            }
             break;
         }
       },
@@ -62,6 +63,6 @@ int getIndexFromLocation(String location) {
   if (location == '/') return 0;
   if (location == '/search') return 1;
   if (location == '/my-tickets') return 2;
-  if (location == '/create-event' || location =='/register') return 3;
+  if (location == '/create-event' || location == '/register') return 3;
   return -1; // Si la ruta no pertenece al BottomNavigationBar
 }

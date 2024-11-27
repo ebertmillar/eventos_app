@@ -14,6 +14,10 @@ class StepNotifier extends StateNotifier<int> {
   void goToStep(int step) {
     state = step;
   }
+  
+  void reset() {
+    state = 0; // Reinicia al primer paso
+  }
 }
 
 final stepProvider = StateNotifierProvider<StepNotifier, int>((ref) {

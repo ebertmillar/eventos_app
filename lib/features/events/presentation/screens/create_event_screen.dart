@@ -30,7 +30,11 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     super.initState();
     //ref.read(eventProvider(widget.eventId).notifier);
     if (widget.eventId != null) {
-      ref.read(eventProvider(widget.eventId!).notifier);
+      Future.delayed(Duration.zero, () {
+        ref.read(stepProvider.notifier).reset();
+        ref.read(eventProvider(widget.eventId!).notifier);
+      });
+      
     }
   }
 
@@ -61,6 +65,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     }
 
     final event = widget.eventId != null ? eventState.event : null;
+    final isEditing = widget.eventId != null && widget.eventId != 'new';
 
     return Scaffold(
       appBar: const CustomAppbar(),
@@ -203,7 +208,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                             const SizedBox(width: 16),
                             Expanded(
                               child: CustomFilledButton(
-                                text: currentStep == 3 ? 'Crear evento' : 'Siguiente',
+                                text: currentStep == 3
+                                  ? (isEditing ? 'Actualizar Evento' : 'Crear Evento')
+                                  : 'Siguiente',
                                 textColor: Colors.orange,
                                 buttonColor: Colors.black87,
                                 onPressed: () async {
@@ -270,7 +277,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                                     );
 
                                     // Aquí puedes redirigir al usuario a otra pantalla o realizar cualquier otra acción necesaria
-                                    GoRouter.of(context).go('/success'); // Redirigir al usuario a una página de éxito, por ejemplo
+                                    GoRouter.of(context).go('/'); // Redirigir al usuario a una página de éxito, por ejemplo
                                   }
                                   
                                   ref.read(stepProvider.notifier).nextStep();

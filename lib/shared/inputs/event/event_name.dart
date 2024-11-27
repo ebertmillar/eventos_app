@@ -6,7 +6,11 @@ enum EventNameError { empty, format }
 // Extender FormzInput y proporcionar el tipo de entrada y el tipo de error.
 class EventName extends FormzInput<String, EventNameError> {
   // Expresión regular para permitir letras, números, espacios y algunos caracteres especiales comunes en títulos (como punto, coma, y guion)
-  static final RegExp titleRegExp = RegExp(r'^[a-zA-Z0-9\s,\.&-]+$');
+  
+  static final RegExp titleRegExp = RegExp(
+    r'^[a-zA-ZÀ-ÿ0-9\s,\.&-]+$', // Permite caracteres acentuados y otros caracteres válidos
+    caseSensitive: false,
+  );
 
   // Llamar a super.pure para representar una entrada de formulario no modificada.
   const EventName.pure() : super.pure('');

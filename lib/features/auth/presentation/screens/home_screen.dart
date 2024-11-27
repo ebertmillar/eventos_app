@@ -1,5 +1,4 @@
 
-import 'package:eventos_app/core/config/router/app_router.dart';
 import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/shared/shared.dart';
@@ -212,6 +211,12 @@ class HomeViewState extends ConsumerState{
                               ],
                             ),
                           ),
+                          IconButton(
+                            onPressed: (){
+                              final event = eventsState.events[index];
+                                context.push('/create-event/${ event.id}');
+                            }, 
+                            icon: const Icon(Icons.edit)),
 
                           const SizedBox(height: 30),
                         ],

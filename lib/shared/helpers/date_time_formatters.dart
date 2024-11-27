@@ -33,3 +33,12 @@ TimeOfDay? parseTimeWithAMPM(String input) {
   }
   return null; // Retorna null si no es válido
 }
+
+String? formatTimeOfDay(TimeOfDay? time) {
+  if (time == null) {
+    return null; // Manejar el caso nulo
+  }
+  final hours = time.hour.toString().padLeft(2, '0'); // Asegurar dos dígitos
+  final minutes = time.minute.toString().padLeft(2, '0'); // Asegurar dos dígitos
+  return '$hours:$minutes'; // Formato HH:mm
+}

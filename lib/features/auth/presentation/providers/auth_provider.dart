@@ -75,15 +75,32 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     print('Token recuperado en checkAuthStatus: $token');
 
     if (token == null || token.isEmpty) {
-      print('Token no encontrado o es inválido. Desconectando.');
+      print('Token no encontrado. Desconectando al usuario.');
       return logout();
     }
 
     try {
-      final user = await authRepository.checkAuthStatus(token);
-      _setLoggedUser(user);
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        print('El usuario no está autenticado. Verifica el token.');
+        return logout();
+      }
+
+      final idToken = await currentUser.getIdToken(true);
+        print('Token renovado al verificar estado: $idToken');
+      // Imprimir el email del usuario autenticado
+        print('Usuario autenticado:');
+        print('Email: ${currentUser.email}');
+        print('Token renovado al verificar estado: $idToken');
+
+      // Actualizar estado
+      state = state.copyWith(
+        authStatus: AuthStatus.authenticated,
+        idToken: idToken,
+      );
     } catch (e) {
-      print('Error de autenticación: $e');
+      print('Error al verificar el estado de autenticación: $e');
       logout();
     }
   }
@@ -94,6 +111,9 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     // Obtener idToken a partir del customToken y guardarlo en el almacenamiento
     final idToken = await FirebaseAuth.instance.currentUser?.getIdToken() ?? '';
     await keyValueStorage.setKeyValue('token', idToken);
+     print('Usuario autenticado:');
+      print('Email: ${user.email}');
+      print('ID Token: $idToken');
 
     // Usa el idToken directamente y guárdalo en SharedPreferences
   

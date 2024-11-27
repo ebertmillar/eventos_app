@@ -13,8 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class CreateEventScreen extends ConsumerStatefulWidget {
+  
+  final String? eventId;
 
-  const CreateEventScreen({super.key});
+  const CreateEventScreen({super.key, this.eventId});
 
   @override
   ConsumerState<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -27,6 +29,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   void initState() {
     super.initState();
     //ref.read(eventProvider(widget.eventId).notifier);
+    if (widget.eventId != null) {
+      ref.read(eventProvider(widget.eventId!).notifier);
+    }
   }
 
   @override
@@ -48,7 +53,14 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     final currentStep = ref.watch(stepProvider);
+    final eventState = ref.watch(eventProvider(widget.eventId!));
     //final eventFormNotifier =ref.watch(createEventFormProvider);
+
+    if (widget.eventId != null && eventState.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final event = widget.eventId != null ? eventState.event : null;
 
     return Scaffold(
       appBar: const CustomAppbar(),
@@ -158,10 +170,10 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (currentStep == 0) const DatosDelEventoForm(),
-                    if (currentStep == 1) const InscriptionsForm(),
-                    if (currentStep == 2) const AgendaFormScreen(),
-                    if (currentStep == 3) const DatosContactoScreen(),
+                    if (currentStep == 0) DatosDelEventoForm(event: event,),
+                    if (currentStep == 1) InscriptionsForm(event: event,),
+                    if (currentStep == 2) AgendaFormScreen(event: event),
+                    if (currentStep == 3) DatosContactoScreen(event: event),
 
                     const SizedBox(height: 25),
 
@@ -194,38 +206,64 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                                 text: currentStep == 3 ? 'Crear evento' : 'Siguiente',
                                 textColor: Colors.orange,
                                 buttonColor: Colors.black87,
-                                onPressed: () {
+                                onPressed: () async {
                                   if(currentStep == 0){
-                                    ref.read(createEventFormProvider.notifier).onSubmitEventInformation();
-                                    final eventFormState = ref.watch(createEventFormProvider);
-                                    if (!eventFormState.isEventInfoPosted || !eventFormState.isValid) return;       
+                                    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
+                                    await eventFormNotifier.onSubmitEventInformation();
+
+                                    final eventFormState = ref.read(createEventFormProvider(event));
+                                    if (!eventFormState.isEventInfoPosted || !eventFormState.isValid) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Por favor, completa la información del evento.')),
+                                      );
+                                      return;
+                                    }      
                                   }
                                   if(currentStep == 1){
-                                    ref.read(createEventFormProvider.notifier).onSubmitEventInscription();
-                                    final eventFormState = ref.watch(createEventFormProvider);
-                                    if (!eventFormState.isEventIncriptionPosted || !eventFormState.isValid) return;   
-                                  }
-                                  if(currentStep == 2){
-                                    ref.read(createEventFormProvider.notifier).onSubmitEventAgenda();
-                                    final eventFormState = ref.watch(createEventFormProvider);
-                                    if (!eventFormState.isEventAgendaPosted || !eventFormState.isValid) return;   
-                                  }
-                                  if (currentStep == 3) {
-                                    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
-                                    final eventFormState = ref.watch(createEventFormProvider);
+                                    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
+                                    await eventFormNotifier.onSubmitEventInscription();
 
-                                    eventFormNotifier.onSubmitCreateEvent();
-                                    // Validar si todos los pasos anteriores son válidos
-                                    if (!eventFormState.isEventInfoPosted ||
-                                        !eventFormState.isEventIncriptionPosted ||
-                                        !eventFormState.isEventAgendaPosted ||
-                                        !eventFormState.isEventContactPosted ||
-                                        !eventFormState.isValid) {
+                                    final eventFormState = ref.read(createEventFormProvider(event));
+                                    if (!eventFormState.isEventIncriptionPosted || !eventFormState.isValid) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Por favor, completa toda la información del evento.')),
+                                        const SnackBar(content: Text('Por favor, completa los detalles de inscripción.')),
                                       );
                                       return;
                                     }
+                                  }
+                                  if(currentStep == 2){
+                                    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
+                                    await eventFormNotifier.onSubmitEventAgenda();
+
+                                    final eventFormState = ref.read(createEventFormProvider(event));
+                                    if (!eventFormState.isEventAgendaPosted || !eventFormState.isValid) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Por favor, completa la agenda del evento.')),
+                                      );
+                                      return;
+                                    }   
+                                  }
+                                  if (currentStep == 3) {
+                                    if (eventState.event == null) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('No se encontró el evento para actualizar o crear.')),
+                                        );
+                                        return;
+                                      }
+                                      final eventFormNotifier = ref.read(createEventFormProvider(eventState.event!).notifier);
+                                      await eventFormNotifier.onSubmitCreateEvent();   
+
+                                      final eventFormState = ref.read(createEventFormProvider(eventState.event!));
+                                      if (!eventFormState.isEventInfoPosted ||
+                                          !eventFormState.isEventIncriptionPosted ||
+                                          !eventFormState.isEventAgendaPosted ||
+                                          !eventFormState.isEventContactPosted ||
+                                          !eventFormState.isValid) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Por favor, completa toda la información del evento.')),
+                                        );
+                                        return;
+                                      } 
 
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(content: Text('Evento creado correctamente')),

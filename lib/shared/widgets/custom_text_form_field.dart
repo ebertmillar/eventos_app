@@ -13,6 +13,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final int? maxLines;
   final Widget? suffixIcon;
+  final String? initialValue;
 
 
   const CustomTextFormField({
@@ -27,6 +28,7 @@ class CustomTextFormField extends StatelessWidget {
     this.controller,
     this.maxLines = 1, 
     this.suffixIcon,
+    this.initialValue,
     
   });
   
@@ -42,7 +44,8 @@ class CustomTextFormField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Stack(
         children: [
-          TextFormField(           
+          TextFormField(   
+            initialValue: initialValue,        
             maxLines: maxLines,
             onChanged: onChanged,
             controller: controller,

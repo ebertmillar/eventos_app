@@ -1,16 +1,18 @@
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
 import 'package:eventos_app/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DatosContactoScreen extends ConsumerWidget{
-  const DatosContactoScreen({super.key});
+  final Event? event;
+  const DatosContactoScreen({super.key, this.event});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
-    final eventFormState = ref.watch(createEventFormProvider);
+    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
+    final eventFormState = ref.watch(createEventFormProvider(event!));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,6 +5,11 @@ String formatDate(DateTime date) {
   return formatter.format(date); // Convierte DateTime a String
 }
 
+String? formatDateUpdate(DateTime? date) {
+  if (date == null) return null; // Manejo de valores nulos
+  return DateFormat('dd/MM/yyyy').format(date); // Formato deseado
+}
+
 // Formato: Solo día (dd)
 String formatDay(String dateString) {
   // Define el formato en el que esperas recibir la fecha

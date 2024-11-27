@@ -1,3 +1,4 @@
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
 import 'package:eventos_app/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:path/path.dart' as path;
 class FilePickerField extends ConsumerWidget {
   final String label;
   final String? hint;
+  final Event? event;
   final Color borderColor;
 
   const FilePickerField({
@@ -14,12 +16,13 @@ class FilePickerField extends ConsumerWidget {
     required this.label,
     this.hint,
     this.borderColor = Colors.black45,
+    this.event
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventFormState = ref.watch(createEventFormProvider);
-    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+    final eventFormState = ref.watch(createEventFormProvider(event!));
+    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),

@@ -1,5 +1,4 @@
-  import 'dart:io';
-
+  import 'package:eventos_app/features/events/domain/entities/event.dart';
   import 'package:eventos_app/shared/helpers/date_picker_helper.dart';
   import 'package:eventos_app/shared/helpers/time_picker_helper.dart';
   import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
@@ -11,13 +10,14 @@
   import 'package:image_picker/image_picker.dart';
 
   class DatosDelEventoForm extends ConsumerWidget {
-    const DatosDelEventoForm({super.key});
+    final Event? event;
+    const DatosDelEventoForm({this.event, super.key });
 
     @override
     Widget build(BuildContext context, WidgetRef ref) {
 
-      final eventFormState = ref.watch(createEventFormProvider);
-      final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+      final eventFormState = ref.watch(createEventFormProvider(event!));
+      final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,21 +166,25 @@
           CustomImagePickerField(
             label: 'Imagen de Cabecera',
             hint: 'Carga una imagen',
-            imageName: ref.watch(createEventFormProvider).headerImageName,
-            errorMessage: eventFormState.isEventInfoPosted ? eventFormState.headerImage.errorMessage : null,
+            imageName: ref.watch(createEventFormProvider(event!)).headerImageName,
+            errorMessage: eventFormState.isEventInfoPosted
+                ? eventFormState.headerImage
+                : null,
             suffixIcon: IconButton(
-              icon: const Icon(Icons.add_photo_alternate_outlined, color: Colors.black45, size: 25),
+              icon: const Icon(Icons.add_photo_alternate_outlined,
+                  color: Colors.black45, size: 25),
               onPressed: () async {
                 final picker = ImagePicker();
                 final pickedFile = await picker.pickImage(source: ImageSource.gallery);
                 if (pickedFile != null) {
-                  final imageFile = File(pickedFile.path);
-                  eventFormNotifier.onImageChanged(imageFile);
+                  final imagePath = pickedFile.path; // Ruta como String
+                  eventFormNotifier.onImageChanged(imagePath); // Envía la ruta como String
                 }
               },
             ),
             onPickImage: () {},
-          ),       
+          ),
+
         ],
       );
     }

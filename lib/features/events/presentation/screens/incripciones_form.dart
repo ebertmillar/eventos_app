@@ -1,3 +1,4 @@
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/features/events/enum/payment_method.dart';
 import 'package:eventos_app/shared/helpers/date_picker_helper.dart';
 import 'package:eventos_app/shared/helpers/time_picker_helper.dart';
@@ -9,13 +10,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InscriptionsForm extends ConsumerWidget {
-  const InscriptionsForm({super.key});
+  final Event? event;
+
+  const InscriptionsForm({super.key, this.event});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    final eventFormState = ref.watch(createEventFormProvider);
-    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+    final eventFormState = ref.watch(createEventFormProvider(event!));
+    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +161,7 @@ class InscriptionsForm extends ConsumerWidget {
                       label: 'Público', 
                       value: true, 
                       groupValue: eventFormState.isPublic,
-                      onChanged: (value) => ref.read(createEventFormProvider.notifier).onEventPublicChanged(value),
+                      onChanged: (value) => ref.read(createEventFormProvider(event!).notifier).onEventPublicChanged(value),
                     )
                   ),
                   const SizedBox(width: 50), // Espacio entre los checkboxes
@@ -167,14 +170,16 @@ class InscriptionsForm extends ConsumerWidget {
                       label: 'Privado', 
                       value: false, 
                       groupValue: eventFormState.isPublic,
-                      onChanged: (value) => eventFormNotifier.onEventPublicChanged(value),
+                      onChanged: (value){
+                       ref.read(createEventFormProvider(event!).notifier).onEventPublicChanged(value);
+                       print('isPublic inicial: ${eventFormState.isPublic}');},
                     ),
                   ),
                 ],
               ),
 
             ],
-          ),
+          ),  
         ),
 
         // Campo de aforo del evento
@@ -220,9 +225,11 @@ class InscriptionsForm extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: MetodoPago.values.map((metodo) {
                   final metodoString = metodo.name;
+                  print(metodoString);
 
                   // Access the value of PaymentMethods (a List<String>) to check if it contains the current method
                   final isSelected = eventFormState.paymentMethods.value.contains(metodoString);
+                  print('el metodo de pago seleccionado es ${eventFormState.paymentMethods.value.contains(metodoString)}');
 
                   return CustomCheckBox(
                     label: metodoString
@@ -230,7 +237,7 @@ class InscriptionsForm extends ConsumerWidget {
                         .trim(), // Format label
                     value: isSelected, // Determine if the checkbox should be checked
                     onChanged: (value) => ref
-                        .read(createEventFormProvider.notifier)
+                        .read(createEventFormProvider(event!).notifier)
                         .onPaymentMethodsChanged(metodo, value ?? false), // Update state
                   );
                 }).toList(),
@@ -272,8 +279,8 @@ class InscriptionsForm extends ConsumerWidget {
                   IntrinsicWidth(
                     child: CustomRadiobutton(
                       label: 'Si', 
-                      value: false, 
-                      groupValue: ref.watch(createEventFormProvider).restriccionEdad,
+                      value: true, 
+                      groupValue: ref.watch(createEventFormProvider(event!)).ageRestriction,
                       onChanged: (value) => eventFormNotifier.onAgeRestrictionChanged(value),
                     )
                   ),
@@ -281,8 +288,8 @@ class InscriptionsForm extends ConsumerWidget {
                   IntrinsicWidth(
                     child: CustomRadiobutton(
                       label: 'No', 
-                      value: true, 
-                      groupValue: ref.watch(createEventFormProvider).restriccionEdad,
+                      value: false, 
+                      groupValue: ref.watch(createEventFormProvider(event!)).ageRestriction,
                       onChanged: (value) => eventFormNotifier.onAgeRestrictionChanged(value),
                     ),
                   ),

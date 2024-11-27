@@ -84,6 +84,7 @@ class AuthDatasourcesImpl extends AuthDatasource {
       });
 
       final user = UserMapper.userJsonToEntity(response.data);
+      print('custom token :${ user.token}');
       return user;
 
     } on DioException catch (e) {

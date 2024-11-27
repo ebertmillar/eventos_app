@@ -11,10 +11,10 @@ class Location extends FormzInput<String, LocationError> {
     caseSensitive: false,
   );
   static final RegExp physicalAddressRegExp = RegExp(
-    r'^[a-zA-Z0-9\s,.\-#]+$',
+    r'^[a-zA-ZÀ-ÿ0-9\s,.\-#]+$',
     caseSensitive: false,
   );
-
+  
   // Llamar a super.pure para representar una entrada de formulario no modificada.
   const Location.pure() : super.pure('');
 

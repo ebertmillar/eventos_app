@@ -1,17 +1,19 @@
 
-import 'dart:io';
 import 'package:eventos_app/features/auth/domain/entities/entities.dart';
 import 'package:eventos_app/features/events/domain/entities/activity.dart';
 import 'package:eventos_app/features/events/enum/payment_method.dart';
+import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
+import 'package:eventos_app/features/events/presentation/providers/events_repository_provider.dart';
 import 'package:eventos_app/shared/helpers/date_time_formatters.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
+import 'package:eventos_app/shared/helpers/parse_time_of_day.dart';
 import 'package:eventos_app/shared/infrastucture/infractructure.dart';
 import 'package:eventos_app/shared/inputs/event/additional_info.dart';
 import 'package:eventos_app/shared/inputs/event/inscription_cost.dart';
 import 'package:eventos_app/shared/inputs/event/inscription_end_date.dart';
 import 'package:eventos_app/shared/inputs/event/inscription_start_date.dart';
 import 'package:eventos_app/shared/inputs/event/payment_methods.dart';
-import 'package:eventos_app/shared/inputs/event/venue_capacity%20copy.dart';
+import 'package:eventos_app/shared/inputs/event/venue_capacity.dart';
 import 'package:eventos_app/shared/inputs/social_media.dart';
 import 'package:eventos_app/shared/shared.dart';
 import 'package:file_picker/file_picker.dart';
@@ -22,13 +24,81 @@ import 'package:intl/intl.dart';
 
 
 final createEventFormProvider = 
-  StateNotifierProvider.autoDispose<CreateEventFormNotifier, EventFormState>((ref) {
-    return CreateEventFormNotifier();
+  StateNotifierProvider.autoDispose.family<CreateEventFormNotifier, EventFormState, Event>(
+    (ref, event) {
+
+    //final createUpdateCallback = ref.watch (eventsRepositoryProvider).createUpdateEvent;
+    final createUpdateCallback = ref.watch (eventsProvider.notifier).createOrUpdateEvent;
+
+    return CreateEventFormNotifier(
+      event : event,
+      onSubmitCallback: createUpdateCallback,
+    );
 });
 
-
 class CreateEventFormNotifier extends StateNotifier<EventFormState>{
-  CreateEventFormNotifier() : super(EventFormState()){
+  
+  final Future<bool> Function( Map<String, dynamic> eventLike )? onSubmitCallback;
+
+  CreateEventFormNotifier({
+    this.onSubmitCallback,
+    required Event event
+  }) : super(EventFormState(
+        id: event.id,
+        name :EventName.dirty(value: event.name),
+        description :Description.dirty(value: event.description), 
+        startDate :StartDate.dirty(value: event.startDate), 
+        endDate :EndDate.dirty(value: event.endDate), 
+        startTime : event.startTime,
+        endTime : event.endTime,
+        differentSchedulesPerDay : event.differentSchedulesPerDay,
+        location : Location.dirty(value: event.location),
+        headerImage: event.headerImage,
+        headerImageName: event.headerImage.split('/').last,
+        inscriptionStartDate : InscriptionStartDate.dirty(value: event.inscriptionStartDate),
+        inscriptionEndDate : InscriptionEndDate.dirty(value: event.inscriptionEndDate),      
+        inscriptionStartTime : event.inscriptionStartTime,      
+        inscriptionEndTime : event.inscriptionEndTime,      
+        isPublic: event.isPublic,
+        capacity: VenueCapacity.dirty(value: event.capacity),
+        inscriptionCost: InscriptionCost.dirty(value: event.inscriptionCost),
+        paymentMethods : PaymentMethods.dirty(value:event.paymentMethods),
+        agenda: event.agenda,
+        additionalInfo : AdditionalInfo.dirty(value: event.additionalInformation),
+        attachedDocument: event.attachedDocuments,
+        ageRestriction: event.ageRestriction,
+        contactName : CompanyName.dirty(value: event.contactName),
+        contactPhone : Phone.dirty(value: event.contactPhone),
+        contactEmail : Email.dirty(value: event.contactEmail),
+        webpage: SocialMedia.dirty(value: event.webpage ?? ''),
+        instagram : SocialMedia.dirty(value: event.webpage ?? ''),
+        facebook : SocialMedia.dirty(value: event.instagram ?? ''),
+        youtube : SocialMedia.dirty(value: event.youtube ?? ''),
+        linkedin : SocialMedia.dirty(value: event.linkedin ?? '')
+    )){
+
+      nameController.text = event.name;
+      descriptionController.text = event.description;
+      startDateController.text = formatDate(event.startDate);
+      endDateController.text = formatDate(event.endDate);
+      startTimeController.text = formatTimeWithAMPM(event.startTime);
+      endTimeController.text = formatTimeWithAMPM(event.endTime);
+      locationController.text = event.location;
+      inscriptionStartDateController.text = formatDate(event.inscriptionStartDate);
+      inscriptionEndDateController.text = formatDate(event.inscriptionEndDate);
+      eventCapacityController.text = event.capacity.toString();
+      eventCostController.text = event.inscriptionCost.toString();
+      contactNameController.text = event.contactName;
+      contactPhoneController.text = event.contactPhone;
+      contactEmailController.text = event.contactEmail;
+      webpageController.text = event.webpage ?? '';
+      instagramController.text = event.instagram ?? '';
+      facebookController.text = event.facebook ?? '';
+      youtubeController.text = event.youtube ?? '';
+      linkedinController.text = event.linkedin ?? '';
+      additionalInfoController.text = event.additionalInformation;
+
+      print('metodo depago de event.payment: ${event.paymentMethods}');
 
     startDateController.addListener(() {
     final text = startDateController.text.trim();
@@ -358,6 +428,7 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
   final TextEditingController endDateController = TextEditingController();
   final TextEditingController startTimeController = TextEditingController();
   final TextEditingController endTimeController = TextEditingController();
+  final TextEditingController differentSchedulesPerDayController= TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController headerImageController = TextEditingController();
   final TextEditingController inscriptionStartDateController = TextEditingController();
@@ -485,19 +556,17 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
     endTimeController.text = formatTimeWithAMPM(time); // Formatea y actualiza el texto del controlador
   }
 
-  void onImageChanged(File image) {
-    final newImage = HeaderImage.dirty(value: image);
+  void onImageChanged(String imagePath) {
+    final imageName = imagePath.split('/').last; // Extrae el nombre de la imagen
 
     state = state.copyWith(
-      headerImage: newImage,
-      headerImageName: image.path.split('/').last, // Muestra el nombre de la imagen
+      headerImageName: imageName, // Actualiza el nombre de la imagen
       isValid: Formz.validate([
         state.name,
         state.description,
         state.startDate,
         state.endDate,
         state.location,
-        newImage,
       ]),
     );
   }
@@ -586,7 +655,7 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
   }
 
   void onEventCapacityChanged(int capacity){
-    final newVenueCapacity = VenueCapacity.dirty(value: capacity.toString());
+    final newVenueCapacity = VenueCapacity.dirty(value: capacity);
     state = state.copyWith(
       capacity: newVenueCapacity,
       isValid: Formz.validate([
@@ -602,7 +671,7 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
   // Métodos para actualizar los campos
   void onCostChanged(double inscriptionCost) {
 
-    final newInscriptionCost= InscriptionCost.dirty(value: inscriptionCost.toString());
+    final newInscriptionCost= InscriptionCost.dirty(value: inscriptionCost);
     state = state.copyWith(
       inscriptionCost: newInscriptionCost,
       isValid: Formz.validate([
@@ -740,7 +809,7 @@ void removeActivity(String dia, int index) {
   }
 
   void onAttachedDocumentsChanged(List<String>? value) {
-    state = state.copyWith(attachedDcoment: value);
+    state = state.copyWith(attachedDocument: value);
   }
 
   Future<void> pickFiles() async {
@@ -749,7 +818,7 @@ void removeActivity(String dia, int index) {
       // Agregamos los nuevos archivos al estado actual
       final currentFiles = List<String>.from(state.attachedDocument ?? []);
       final newFiles = result.files.map((file) => file.path!).toList();
-      state = state.copyWith(attachedDcoment: [...currentFiles, ...newFiles]);
+      state = state.copyWith(attachedDocument: [...currentFiles, ...newFiles]);
     }
   }
 
@@ -758,20 +827,20 @@ void removeActivity(String dia, int index) {
     final currentFiles = List<String>.from(state.attachedDocument ?? []);
     if (index >= 0 && index < currentFiles.length) {
       currentFiles.removeAt(index);
-      state = state.copyWith(attachedDcoment: currentFiles);
+      state = state.copyWith(attachedDocument: currentFiles);
     }
   }
 
   void clearFiles() {
     // Limpia todos los archivos
-    state = state.copyWith(attachedDcoment: []);
+    state = state.copyWith(attachedDocument: []);
   }
 
 
  
 
   void onAgeRestrictionChanged(bool value) {
-    state = state.copyWith(restriccionEdad: value);
+    state = state.copyWith(ageRestriction: value);
   }
 
   void onContactNameChanged(String contactName) {
@@ -871,25 +940,70 @@ void removeActivity(String dia, int index) {
   }
 
 
-  void onSubmitCreateEvent(){
+  Future<bool> onSubmitCreateEvent() async{
     onSubmitEventInformation();
-    if (!state.isEventInfoPosted) return;
+    if (!state.isEventInfoPosted) return false;
 
     onSubmitEventInscription();
-    if (!state.isEventIncriptionPosted) return;
+    if (!state.isEventIncriptionPosted) return false;
 
     onSubmitEventAgenda();
-    if (!state.isEventAgendaPosted) return;
+    if (!state.isEventAgendaPosted) return false;
 
     onSubmitEventContact();
-    if (!state.isEventContactPosted) return;
+    if (!state.isEventContactPosted) return false;
 
-    print('Evento creado exitosamente.');
+    final eventLike = {
+      'id': (state.id == 'new') ? null : state.id,
+      'name': state.name.value,
+      'description': state.description.value,
+      'startDate': state.startDate.value?.toIso8601String(),
+      'endDate': state.endDate.value?.toIso8601String(),
+      'startTime': timeOfDayToString(state.startTime), // Convertir TimeOfDay a String
+      'endTime': timeOfDayToString(state.endTime), // Convertir TimeOfDay a String
+      'differentSchedulesPerDay': state.differentSchedulesPerDay,
+      'location': state.location.value,
+      'headerImage': state.headerImage,
+      'inscriptionStartDate': state.inscriptionStartDate.value?.toIso8601String(),
+      'inscriptionEndDate': state.inscriptionEndDate.value?.toIso8601String(),
+      'inscriptionStartTime': timeOfDayToString(state.inscriptionStartTime), // Convertir TimeOfDay a String
+      'inscriptionEndTime': timeOfDayToString(state.inscriptionEndTime), // Convertir TimeOfDay a String
+      'isPublic': state.isPublic,
+      'capacity': state.capacity.value,
+      'inscriptionCost': state.inscriptionCost.value,
+      'paymentMethods': state.paymentMethods.value,
+      'agenda': state.agenda.map((day) => {
+        'day': day.day,
+        'date': day.date.toIso8601String(),
+        'activities': day.activities.map((activity) => activity.toMap()).toList(),
+      }).toList(),
+      'additionalInformation': state.additionalInfo?.value,
+      'attachedDocuments': state.attachedDocument,
+      'ageRestriction': state.ageRestriction,
+      'contactName': state.contactName.value,
+      'contactPhone': state.contactPhone.value,
+      'contactEmail': state.contactEmail.value,
+      'webpage': state.webpage?.value,
+      'instagram': state.instagram?.value,
+      'facebook': state.facebook?.value,
+      'youtube': state.youtube?.value,
+      'linkedin': state.linkedin?.value,
+    };
+
+
+
+      try {
+        return await onSubmitCallback! (eventLike);      
+       
+      } catch (e) {
+        return false;
+      }
+
     }
 
 
  
-   void onSubmitEventInformation() {
+   Future<void> onSubmitEventInformation() async{
     // Validar y actualizar campos
     _touchFieldsEventInformation();
 
@@ -910,7 +1024,7 @@ void removeActivity(String dia, int index) {
     final startDate = StartDate.dirty(value: state.startDate.value);
     final endDate = EndDate.dirty(startDate: state.startDate.value, value: state.endDate.value);
     final location = Location.dirty(value: state.location.value);
-    final headerImage = HeaderImage.dirty(value: state.headerImage.value);
+    final headerImage = state.headerImage;
 
     state = state.copyWith(
       isEventInfoPosted: true,
@@ -920,17 +1034,16 @@ void removeActivity(String dia, int index) {
       endDate: endDate,
       location: location,
       headerImage: headerImage,
-      isValid: Formz.validate([name, description, startDate, endDate, location, headerImage])
+      isValid: Formz.validate([name, description, startDate, endDate, location])
     );
-    if (headerImage.value != null) {
-    print('HeaderImage Path: ${headerImage.value!.path}');
-  } 
+   
+  
     print('Form isValid: ${state.isValid}');
 
   }
 
 
-  void onSubmitEventInscription() {
+  Future<void> onSubmitEventInscription() async{
     // Validar y actualizar campos
     _touchFieldsEventInscription();
 
@@ -972,7 +1085,7 @@ void removeActivity(String dia, int index) {
   }
 
   
-  void onSubmitEventAgenda() {
+  Future<void> onSubmitEventAgenda() async {
     // Validar y actualizar campos
     _touchFieldsEventAgenda();
 
@@ -996,12 +1109,12 @@ void removeActivity(String dia, int index) {
       isEventAgendaPosted: true,
       agenda: agenda,
       additionalInfo: additionalInfo,
-      attachedDcoment: attachedDocument,
+      attachedDocument: attachedDocument,
       isValid: Formz.validate([additionalInfo])      
     ); 
   }
 
-  void onSubmitEventContact() {
+  Future<void> onSubmitEventContact() async {
     // Validar y actualizar campos
     _touchFieldsEventContact();
 
@@ -1062,6 +1175,7 @@ class EventFormState {
   final bool isEventAgendaPosted;
   final bool isEventContactPosted;
   final bool isValid;
+  final String? id;
   final EventName name;
   final Description description;
   final StartDate startDate;
@@ -1070,7 +1184,7 @@ class EventFormState {
   final TimeOfDay? endTime;
   final bool? differentSchedulesPerDay;
   final Location location;
-  final HeaderImage headerImage;
+  final String headerImage;
   final String? headerImageName;
   final String? headerImageError;
   final InscriptionStartDate inscriptionStartDate;
@@ -1084,7 +1198,7 @@ class EventFormState {
   final List<AgendaDay> agenda;
   final AdditionalInfo? additionalInfo;
   final List<String>? attachedDocument;
-  final bool restriccionEdad;
+  final bool ageRestriction;
   final CompanyName contactName;
   final Phone contactPhone;
   final Email contactEmail;
@@ -1103,6 +1217,7 @@ class EventFormState {
     this.isEventAgendaPosted = false,
     this.isEventContactPosted = false,
     this.isValid = false, 
+    this.id,
     this.name = const EventName.pure(),
     this.description = const Description.pure(),
     this.startDate = const StartDate.pure(),
@@ -1111,7 +1226,7 @@ class EventFormState {
     this.endTime,
     this.differentSchedulesPerDay=false,
     this.location = const Location.pure(),
-    this.headerImage = const HeaderImage.pure(),
+    this.headerImage = '',
     this.headerImageName,
     this.headerImageError,
     this.inscriptionStartDate = const InscriptionStartDate.pure(),
@@ -1125,7 +1240,7 @@ class EventFormState {
     this.agenda = const [],
     this.additionalInfo = const AdditionalInfo.pure(),
     this.attachedDocument,
-    this.restriccionEdad = false,
+    this.ageRestriction = false,
     this.contactName = const CompanyName.pure(),
     this.contactPhone = const Phone.pure(),
     this.contactEmail = const Email.pure(),
@@ -1144,6 +1259,7 @@ class EventFormState {
     bool? isEventAgendaPosted,
     bool? isEventContactPosted,
     bool? isValid,
+    String? id,
     EventName? name,
     Description? description,
     StartDate? startDate,
@@ -1152,7 +1268,7 @@ class EventFormState {
     TimeOfDay? endTime,
     bool? differentSchedulesPerDay,
     Location? location,
-    HeaderImage? headerImage,
+    String? headerImage,
     String? headerImageName,
     String? headerImageError,
     InscriptionStartDate? inscriptionStartDate,
@@ -1165,8 +1281,8 @@ class EventFormState {
     PaymentMethods? paymentMethods,
     List<AgendaDay>? agenda,
     AdditionalInfo? additionalInfo,
-    List<String>? attachedDcoment,
-    bool? restriccionEdad,
+    List<String>? attachedDocument,
+    bool? ageRestriction,
     CompanyName? contactName,
     Phone? contactPhone,
     Email? contactEmail,
@@ -1183,6 +1299,7 @@ class EventFormState {
     isEventAgendaPosted: isEventAgendaPosted ?? this.isEventAgendaPosted,
     isEventContactPosted: isEventContactPosted ?? this.isEventContactPosted,
     isValid: isValid ?? this.isValid,
+    id: id ?? this.id,
     name: name ?? this.name,
     description: description ?? this.description,
     startDate: startDate ?? this.startDate,
@@ -1204,8 +1321,8 @@ class EventFormState {
     paymentMethods: paymentMethods ?? this.paymentMethods,
     agenda: agenda ?? this.agenda,
     additionalInfo: additionalInfo ?? this.additionalInfo,
-    attachedDocument: attachedDcoment ?? this.attachedDocument,
-    restriccionEdad: restriccionEdad ?? this.restriccionEdad,
+    attachedDocument: attachedDocument ?? this.attachedDocument,
+    ageRestriction: ageRestriction ?? this.ageRestriction,
     contactName: contactName ?? this.contactName,
     contactPhone: contactPhone ?? this.contactPhone,
     contactEmail: contactEmail ?? this.contactEmail,

@@ -33,9 +33,17 @@ final goRouterProvider = Provider((ref) {
         path: '/',
         builder: (context, state) => const HomeScreen(),
       ),
+      // GoRoute(
+      //   path: '/create-event',
+      //   builder: (context, state) => const CreateEventScreen(
+          
+      //   ), 
+      // ),
       GoRoute(
-        path: '/create-event',
-        builder: (context, state) => const CreateEventScreen(), 
+        path: '/create-event/:id',
+        builder: (context, state) => CreateEventScreen(
+          eventId: state.pathParameters['id'] ?? 'no-id',
+        ), 
       ),
       GoRoute(
         path: '/event/:id',

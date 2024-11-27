@@ -1,4 +1,5 @@
 import 'package:eventos_app/features/events/domain/entities/activity.dart';
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/shared/helpers/date_picker_helper.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
@@ -10,12 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AgendaFormScreen extends ConsumerWidget {
-  const AgendaFormScreen({super.key});
+  final Event? event;
+  const AgendaFormScreen({super.key, this.event});
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventFormState = ref.watch(createEventFormProvider);
-    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+    final eventFormState = ref.watch(createEventFormProvider(event!));
+    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
 
     return SingleChildScrollView(
       child: Column(
@@ -75,9 +77,10 @@ class AgendaFormScreen extends ConsumerWidget {
           const SizedBox(height: 10),
 
           // Campo para adjuntar documentos
-          const FilePickerField(
+          FilePickerField(
             label: 'Adjunta documentos',
             hint: 'Adjunta cartelera, folletos, etc.',
+            event: event,
           ),
 
           const SizedBox(height: 10),
@@ -87,7 +90,7 @@ class AgendaFormScreen extends ConsumerWidget {
   }
 
   bool _validateEventDates(BuildContext context, WidgetRef ref) {
-    final eventFormState = ref.read(createEventFormProvider);
+    final eventFormState = ref.read(createEventFormProvider(event!));
     if (eventFormState.startDate.value == null || eventFormState.endDate.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Primero debes seleccionar una fecha de inicio y fin del evento.')),
@@ -100,8 +103,8 @@ class AgendaFormScreen extends ConsumerWidget {
   
 
 void _showAddDayDialog(BuildContext context, WidgetRef ref) async {
-  final eventFormState = ref.read(createEventFormProvider);
-  final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+  final eventFormState = ref.read(createEventFormProvider(event!));
+  final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
 
   final selectedDate = await showDatePickerHelper(
     context: context,
@@ -132,7 +135,7 @@ void _showAddDayDialog(BuildContext context, WidgetRef ref) async {
     final startTimeController = TextEditingController();
     final endTimeController = TextEditingController();
     final titleController = TextEditingController();
-    final eventFormNotifier = ref.read(createEventFormProvider.notifier);
+    final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
 
     showDialog(
       context: context,

@@ -6,8 +6,10 @@ enum CompanyNameError { empty, format }
 // Extender FormzInput y proporcionar el tipo de entrada y el tipo de error.
 class CompanyName extends FormzInput<String, CompanyNameError> {
   // Expresión regular para permitir letras, números, espacios y algunos caracteres especiales comunes en nombres de empresas (como punto, coma, y, y guion)
-  static final RegExp companyNameRegExp = RegExp(r'^[a-zA-Z0-9\s,\.&-]+$');
-
+  static final RegExp companyNameRegExp = RegExp(
+    r'^[a-zA-ZÀ-ÿ0-9\s,\.&-]+$', // Añadido soporte para caracteres con tildes (À-ÿ)
+    caseSensitive: false,
+  );
   // Llamar a super.pure para representar una entrada de formulario no modificada.
   const CompanyName.pure() : super.pure('');
 

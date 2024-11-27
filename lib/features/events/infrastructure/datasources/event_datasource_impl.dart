@@ -22,9 +22,31 @@ class EventDatasourceImpl extends EventsDatasource {
 
 
   @override
-  Future<Event> createUpdateEvent(Map<String, dynamic> eventLike) {
-    // TODO: implement createUpdateEvent
-    throw UnimplementedError();
+  Future<Event> createUpdateEvent(Map<String, dynamic> eventLike) async {
+    
+    try {
+
+      final String? eventId = eventLike['id'];
+      final String method = ( eventId == null) ? 'POST' : 'PATCH';
+      final String url = (eventId == null) ?'/api/create-events' :'/api/update-event/$eventId';
+      eventLike.remove('id');
+
+
+      final response = await dio.request(
+        url,
+        data: eventLike,
+        options: Options(
+          method: method,
+        ),
+      );
+
+      print(response.data);
+      final event = EventMapper.jsonToEntity(response.data);
+      return event;
+      
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   @override

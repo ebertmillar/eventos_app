@@ -8,7 +8,7 @@ class EventMapper {
   static Event jsonToEntity(Map<String, dynamic> json) {
     // Mapear solo los campos presentes en la respuesta del servidor
     return Event(
-      id: json["id"],
+      id: json["id"] ?? '',
       createdBy: json["createdBy"],
       name: json["name"],
       description: json["description"],

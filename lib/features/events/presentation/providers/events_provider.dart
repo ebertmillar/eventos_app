@@ -25,6 +25,33 @@ class EventsNotifier extends StateNotifier<EventsState> {
     loadNextPage();
   }
   
+  Future<bool> createOrUpdateEvent(Map<String,dynamic> eventLike) async {
+
+    try {
+      final event = await eventsRepository.createUpdateEvent(eventLike);
+      final isEventInList = state.events.any(( element )=> element.id == event.id  );
+
+      if (!isEventInList) {
+        state = state.copyWith(
+          events: [...state.events, event]
+        );
+        return true;
+      }
+
+      state = state.copyWith(
+        events: state.events.map(
+          (element) => ( element.id == event.id) ? event : element).toList()
+      );
+
+      return true;
+
+
+
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future loadNextPage() async {
 
     if( state.isLoading || state.isLastPage) return;

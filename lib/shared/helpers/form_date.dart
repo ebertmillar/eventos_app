@@ -10,13 +10,15 @@ String? formatDateUpdate(DateTime? date) {
   return DateFormat('dd/MM/yyyy').format(date); // Formato deseado
 }
 
-// Formato: Solo día (dd)
-String formatDay(String dateString) {
-  // Define el formato en el que esperas recibir la fecha
-  final DateFormat inputFormat = DateFormat('dd/MM/yyyy');
-  final DateTime date = inputFormat.parse(dateString); // Convierte el String a DateTime
-  final DateFormat outputFormat = DateFormat('dd'); // Formato de salida
-  return outputFormat.format(date); // Devuelve solo el día
+String formatDay(String input) {
+  final regex = RegExp(r'\((.*?)\)'); // Encuentra el texto dentro de paréntesis
+  final match = regex.firstMatch(input);
+
+  if (match != null) {
+    final datePart = match.group(1); // Extrae "05/12/2024"
+    return datePart ?? input; // Retorna la fecha o el texto completo si no es válida
+  }
+  return input; // Retorna el texto sin cambios si no coincide
 }
 
 // Formato: Día y mes (dd/MM)

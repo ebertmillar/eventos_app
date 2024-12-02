@@ -45,31 +45,55 @@ class EventDatasourceImpl extends EventsDatasource {
     return uploadedPhotoUrl;
   }
 
-  Future<String> _uploadFileDocuments (String path) async{
-
+  Future<List<String>> _uploadFileDocuments(String path) async {
     try {
       final data = _buildFormData(path, 'files');
-      final response = await dio.post('/api/files/event/documents/$userId', data: data );
-      return response.data['files'];
-
+      final response = await dio.post('/api/files/event/documents/$userId', data: data);
+      return List<String>.from(response.data['files']); // Asegurarte de convertir correctamente
     } catch (e) {
-      throw Exception();
+      throw Exception('Error uploading documents: $e');
     }
   }
 
 
-  Future<List<String>> _uploadDocuments( List<String> documents ) async {
-    
-    final documentsToUpload = documents.where((element) => element.contains('/') ).toList();
-    final documentsToIgnore = documents.where((element) => !element.contains('/') ).toList();
+  Future<List<String>> _uploadDocuments(List<String> documents) async {
+    // Filtrar documentos que ya son URLs y no necesitan subirse
+    final documentsToIgnore = documents.where((doc) => doc.startsWith('http://') || doc.startsWith('https://')).toList();
+    // Filtrar documentos que necesitan ser subidos
+    final documentsToUpload = documents.where((doc) => !doc.startsWith('http://') && !doc.startsWith('https://')).toList();
 
-    //Todo: crear una serie de Futures de carga de imágenes
-    final List<Future<String>> uploadJob = documentsToUpload.map(_uploadFileDocuments).toList();
+    if (documentsToUpload.isEmpty) {
+      // Si no hay nada que subir, devolver solo los documentos ignorados
+      return documentsToIgnore;
+    }
 
-    final newImages = await Future.wait(uploadJob);
-    
-    return [...documentsToIgnore, ...newImages ];
+    try {
+      // Subir documentos de forma paralela
+      final List<Future<List<String>>> uploadJobs = documentsToUpload.map(_uploadFileDocuments).toList();
+
+      // Esperar todas las subidas y aplanar la lista
+      final List<List<String>> uploadedDocs = await Future.wait(uploadJobs);
+
+      // Convertir la lista de listas en una lista plana
+      final newDocuments = uploadedDocs.expand((docs) => docs).toList();
+
+      // Combinar los documentos ignorados con los recién subidos
+      return [...documentsToIgnore, ...newDocuments];
+    } catch (e) {
+      throw Exception('Error uploading documents: $e');
+    }
   }
+
+  Future<void> deleteDocument(String userId, String fileName) async {
+  try {
+    final response = await dio.delete('/api/files/event/documents/$userId/$fileName');
+    if (response.statusCode != 200) {
+      throw Exception("Error al eliminar el archivo: ${response.data['error']}");
+    }
+  } catch (e) {
+    throw Exception("Error al intentar eliminar el archivo: $e");
+  }
+}
 
 
 

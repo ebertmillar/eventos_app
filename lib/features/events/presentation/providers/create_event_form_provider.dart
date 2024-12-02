@@ -824,7 +824,6 @@ void removeActivity(String dia, int index) {
   }
 
   void removeFile(int index) {
-    // Verifica si hay archivos en el estado
     final currentFiles = List<String>.from(state.attachedDocument ?? []);
     if (index >= 0 && index < currentFiles.length) {
       currentFiles.removeAt(index);

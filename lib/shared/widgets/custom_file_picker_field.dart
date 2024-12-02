@@ -1,17 +1,15 @@
-import 'package:eventos_app/features/events/domain/entities/event.dart';
-import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
-import 'package:eventos_app/shared/shared.dart';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as path;
 
-class FilePickerField extends ConsumerWidget {
+class FilePickerField extends StatelessWidget {
   final String label;
   final String? hint;
   final Color borderColor;
   final List<String> attachedFiles;
   final void Function(List<String>) onFilesChanged;
+  final void Function(int) onRemoveFile; // Nuevo callback para eliminar archivos
 
   const FilePickerField({
     super.key,
@@ -20,10 +18,11 @@ class FilePickerField extends ConsumerWidget {
     this.borderColor = Colors.black45,
     required this.attachedFiles,
     required this.onFilesChanged,
+    required this.onRemoveFile, // Requerido ahora
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Stack(
@@ -51,14 +50,13 @@ class FilePickerField extends ConsumerWidget {
                         trailing: IconButton(
                           icon: const Icon(Icons.clear, color: Colors.red),
                           onPressed: () {
-                            final updatedFiles = List<String>.from(attachedFiles)
-                              ..remove(filePath);
-                            onFilesChanged(updatedFiles);
+                            final index = attachedFiles.indexOf(filePath);
+                            onRemoveFile(index); // Invocamos el callback para eliminar
                           },
                         ),
                       );
                     }).toList(),
-                ),
+                  ),
                 if (attachedFiles.isEmpty && hint != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 0, left: 5),
@@ -66,13 +64,11 @@ class FilePickerField extends ConsumerWidget {
                       hint!,
                       style: const TextStyle(fontSize: 14, color: Colors.black54),
                     ),
-                ),
+                  ),
                 const SizedBox(height: 25),
                 Align(
                   alignment: Alignment.center,
-                  child: CustomFilledButton(
-                    text: '+ Añadir documnetos',
-                    textColor: Colors.orange[500],
+                  child: ElevatedButton(
                     onPressed: () async {
                       final result = await FilePicker.platform.pickFiles(allowMultiple: true);
                       if (result != null) {
@@ -80,6 +76,7 @@ class FilePickerField extends ConsumerWidget {
                         onFilesChanged([...attachedFiles, ...newFiles]);
                       }
                     },
+                    child: const Text('+ Añadir documentos'),
                   ),
                 ),
                 const SizedBox(height: 10),

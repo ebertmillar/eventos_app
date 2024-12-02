@@ -81,7 +81,13 @@ class AgendaFormScreen extends ConsumerWidget {
             label: 'Adjunta documentos',
             hint: 'Adjunta cartelera, folletos, etc.',
             attachedFiles: eventFormState.attachedDocument ?? [],
-            onFilesChanged: (files) => eventFormNotifier.onAttachedDocumentsChanged(files),
+            onFilesChanged: (files) {
+              // Delegamos al notifier las acciones
+              eventFormNotifier.onAttachedDocumentsChanged(files);
+            },
+            onRemoveFile: (index) {
+              eventFormNotifier.removeFile(index);
+            },
           ),
 
           const SizedBox(height: 10),

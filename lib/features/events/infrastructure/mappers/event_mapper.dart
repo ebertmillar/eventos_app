@@ -36,7 +36,13 @@ class EventMapper {
         ? List<AgendaDay>.from(json["agenda"].map((x) => AgendaDayMapper.jsonToEntity(x)))
         :[],
       additionalInformation: json["additionalInformation"],
-      attachedDocuments: _rebuildDocumentUrls(json["createdBy"], json["attachedDocuments"]),
+      attachedDocuments: List<String>.from(
+        (json['attachedDocuments'] ?? []).map(
+          (doc) => doc.startsWith('http')
+              ? doc
+              : '${Environment.apiUrl}/api/files/event/documents/user/${json['createdBy']}/$doc',
+        ),
+      ),
       ageRestriction: json["ageRestriction"] ?? false,
       contactName: json["contactName"],
       contactPhone: json["contactPhone"],
@@ -58,16 +64,6 @@ class EventMapper {
     }
     return '${Environment.apiUrl}/api/files/event/header-image/$imageName';
   }
-
-  static List<String> _rebuildDocumentUrls(String userId, List<String>? documents) {
-  if (documents == null || userId.isEmpty) return [];
-
-  return documents.map(
-    (doc) => doc.startsWith('http')
-        ? doc
-        : '${Environment.apiUrl}/api/files/event/documents/user/$userId/$doc',
-  ).toList();
-}
 
 
 

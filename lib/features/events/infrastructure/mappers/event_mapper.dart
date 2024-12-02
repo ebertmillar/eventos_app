@@ -36,9 +36,7 @@ class EventMapper {
         ? List<AgendaDay>.from(json["agenda"].map((x) => AgendaDayMapper.jsonToEntity(x)))
         :[],
       additionalInformation: json["additionalInformation"],
-      attachedDocuments: json["attachedDocuments"] != null 
-        ? List<String>.from(json["attachedDocuments"].map((x) => x))
-        :[],
+      attachedDocuments: _rebuildDocumentUrls(json["createdBy"], json["attachedDocuments"]),
       ageRestriction: json["ageRestriction"] ?? false,
       contactName: json["contactName"],
       contactPhone: json["contactPhone"],
@@ -58,8 +56,19 @@ class EventMapper {
     if (imageName == null || imageName.startsWith('http')) {
       return imageName ?? ''; // Devolver directamente si ya es una URL
     }
-    return '${Environment.apiUrl}/api/files/event/$imageName';
+    return '${Environment.apiUrl}/api/files/event/header-image/$imageName';
   }
+
+  static List<String> _rebuildDocumentUrls(String userId, List<String>? documents) {
+  if (documents == null || userId.isEmpty) return [];
+
+  return documents.map(
+    (doc) => doc.startsWith('http')
+        ? doc
+        : '${Environment.apiUrl}/api/files/event/documents/user/$userId/$doc',
+  ).toList();
+}
+
 
 
 }

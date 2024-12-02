@@ -7,9 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final eventsRepositoryProvider = Provider<EventRepositoyImpl>((ref){
 
   final accessToken = ref.watch(authProvider).idToken;
+  final userId = ref.watch(authProvider).currentUserId;
 
   final eventsRepository = EventRepositoyImpl(
-    EventDatasourceImpl(accessToken: accessToken)
+    EventDatasourceImpl(accessToken: accessToken, userId: userId)
   );
   return eventsRepository;
 

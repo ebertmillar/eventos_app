@@ -8,10 +8,12 @@ import 'package:eventos_app/features/events/infrastructure/mappers/event_mapper.
 class EventDatasourceImpl extends EventsDatasource {
 
   late final Dio dio;
+  final String? userId;
   final String accessToken;
 
   EventDatasourceImpl({
-    required this.accessToken
+    this.userId,
+    required this.accessToken,
   }): dio = Dio(
     BaseOptions(
       baseUrl: Environment.apiUrl,
@@ -20,30 +22,12 @@ class EventDatasourceImpl extends EventsDatasource {
       }
     ));
 
-  // Future<String> _uploadPhoto ( String photo) async{
-    
-  //   if (!photo.contains('/')) {
-  //     return photo; // Si no contiene '/', asumimos que ya es una URL y no necesita subirse
-  //   }
-
-  //   final Future<String> uploadJob = photo.contains('/') 
-  //     ? _uploadFile(photo) // Si es un archivo local, subimos
-  //     : Future.value(photo);
-      
-  //     return await uploadJob; // Si ya es una URL, lo retornamos directamente
-  // }
-
-  Future<String> _uploadFile (String path) async{
+  Future<String> _uploadFilephoto (String path) async{
 
     try {
       
-      final fileName  = path.split('/').last;
-
-      final FormData data = FormData.fromMap({
-        'image': MultipartFile.fromFileSync(path, filename: fileName),
-      });
-
-      final response = await dio.post('/api/files/event', data: data );
+      final data = _buildFormData(path, 'image');
+      final response = await dio.post('/api/files/event/header-image', data: data );
       return response.data['image'];
 
     } catch (e) {
@@ -57,10 +41,37 @@ class EventDatasourceImpl extends EventsDatasource {
       return photo; // Es una URL, no subir
     }
 
-    // Si contiene '/', subimos el archivo y retornamos la URL generada
-    final String uploadedPhotoUrl = await _uploadFile(photo);
+    final String uploadedPhotoUrl = await _uploadFilephoto(photo);
     return uploadedPhotoUrl;
   }
+
+  Future<String> _uploadFileDocuments (String path) async{
+
+    try {
+      final data = _buildFormData(path, 'files');
+      final response = await dio.post('/api/files/event/documents/$userId', data: data );
+      return response.data['files'];
+
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+
+  Future<List<String>> _uploadDocuments( List<String> documents ) async {
+    
+    final documentsToUpload = documents.where((element) => element.contains('/') ).toList();
+    final documentsToIgnore = documents.where((element) => !element.contains('/') ).toList();
+
+    //Todo: crear una serie de Futures de carga de imágenes
+    final List<Future<String>> uploadJob = documentsToUpload.map(_uploadFileDocuments).toList();
+
+    final newImages = await Future.wait(uploadJob);
+    
+    return [...documentsToIgnore, ...newImages ];
+  }
+
+
 
 
   @override
@@ -73,6 +84,7 @@ class EventDatasourceImpl extends EventsDatasource {
       final String url = (eventId == null) ?'/api/create-events' :'/api/update-event/$eventId';
       eventLike.remove('id');
       eventLike['headerImage'] = await _uploadPhoto(eventLike['headerImage']);
+      eventLike['attachedDocuments'] = await _uploadDocuments( eventLike['attachedDocuments'] );
 
       final response = await dio.request(
         url,
@@ -140,6 +152,14 @@ class EventDatasourceImpl extends EventsDatasource {
 
     return events;
     
+  }
+
+
+  FormData _buildFormData(String path, String key) {
+    final fileName = path.split('/').last;
+    return FormData.fromMap({
+      key: MultipartFile.fromFileSync(path, filename: fileName),
+    });
   }
 }
 

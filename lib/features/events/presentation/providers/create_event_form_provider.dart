@@ -954,43 +954,43 @@ void removeActivity(String dia, int index) {
     onSubmitEventContact();
     if (!state.isEventContactPosted) return false;
 
-    final eventLike = {
-      'id': (state.id == 'new') ? null : state.id,
-      'createdBy': state.createdBy,
-      'name': state.name.value,
-      'description': state.description.value,
-      'startDate': state.startDate.value?.toIso8601String(),
-      'endDate': state.endDate.value?.toIso8601String(),
-      'startTime': timeOfDayToString(state.startTime), // Convertir TimeOfDay a String
-      'endTime': timeOfDayToString(state.endTime), // Convertir TimeOfDay a String
-      'differentSchedulesPerDay': state.differentSchedulesPerDay,
-      'location': state.location.value,
-      'headerImage': state.headerImage.replaceAll('${ Environment.apiUrl }/files/event/', ''),
-      'inscriptionStartDate': state.inscriptionStartDate.value?.toIso8601String(),
-      'inscriptionEndDate': state.inscriptionEndDate.value?.toIso8601String(),
-      'inscriptionStartTime': timeOfDayToString(state.inscriptionStartTime), // Convertir TimeOfDay a String
-      'inscriptionEndTime': timeOfDayToString(state.inscriptionEndTime), // Convertir TimeOfDay a String
-      'isPublic': state.isPublic,
-      'capacity': state.capacity.value,
-      'inscriptionCost': state.inscriptionCost.value,
-      'paymentMethods': state.paymentMethods.value,
-      'agenda': state.agenda.map((day) => {
-        'day': day.day,
-        'date': day.date.toIso8601String(),
-        'activities': day.activities.map((activity) => activity.toMap()).toList(),
-      }).toList(),
-      'additionalInformation': state.additionalInfo?.value,
-      'attachedDocuments': state.attachedDocument,
-      'ageRestriction': state.ageRestriction,
-      'contactName': state.contactName.value,
-      'contactPhone': state.contactPhone.value,
-      'contactEmail': state.contactEmail.value,
-      'webpage': state.webpage?.value,
-      'instagram': state.instagram?.value,
-      'facebook': state.facebook?.value,
-      'youtube': state.youtube?.value,
-      'linkedin': state.linkedin?.value,
-    };
+      final eventLike = {
+        'id': (state.id == 'new') ? null : state.id,
+        'createdBy': state.createdBy,
+        'name': state.name.value,
+        'description': state.description.value,
+        'startDate': state.startDate.value?.toIso8601String(),
+        'endDate': state.endDate.value?.toIso8601String(),
+        'startTime': timeOfDayToString(state.startTime), // Convertir TimeOfDay a String
+        'endTime': timeOfDayToString(state.endTime), // Convertir TimeOfDay a String
+        'differentSchedulesPerDay': state.differentSchedulesPerDay,
+        'location': state.location.value,
+        'headerImage': state.headerImage.replaceAll('${ Environment.apiUrl }/files/event/header-image', ''),
+        'inscriptionStartDate': state.inscriptionStartDate.value?.toIso8601String(),
+        'inscriptionEndDate': state.inscriptionEndDate.value?.toIso8601String(),
+        'inscriptionStartTime': timeOfDayToString(state.inscriptionStartTime), // Convertir TimeOfDay a String
+        'inscriptionEndTime': timeOfDayToString(state.inscriptionEndTime), // Convertir TimeOfDay a String
+        'isPublic': state.isPublic,
+        'capacity': state.capacity.value,
+        'inscriptionCost': state.inscriptionCost.value,
+        'paymentMethods': state.paymentMethods.value,
+        'agenda': state.agenda.map((day) => {
+          'day': day.day,
+          'date': day.date.toIso8601String(),
+          'activities': day.activities.map((activity) => activity.toMap()).toList(),
+        }).toList(),
+        'additionalInformation': state.additionalInfo?.value,
+        'attachedDocuments': state.attachedDocument?.map((doc) => doc.replaceAll('${Environment.apiUrl}/api/files/event/documents/${state.createdBy}/', '')).toList(),
+        'ageRestriction': state.ageRestriction,
+        'contactName': state.contactName.value,
+        'contactPhone': state.contactPhone.value,
+        'contactEmail': state.contactEmail.value,
+        'webpage': state.webpage?.value,
+        'instagram': state.instagram?.value,
+        'facebook': state.facebook?.value,
+        'youtube': state.youtube?.value,
+        'linkedin': state.linkedin?.value,
+      };
 
 
 

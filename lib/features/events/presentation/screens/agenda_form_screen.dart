@@ -80,7 +80,8 @@ class AgendaFormScreen extends ConsumerWidget {
           FilePickerField(
             label: 'Adjunta documentos',
             hint: 'Adjunta cartelera, folletos, etc.',
-            event: event,
+            attachedFiles: eventFormState.attachedDocument ?? [],
+            onFilesChanged: (files) => eventFormNotifier.onAttachedDocumentsChanged(files),
           ),
 
           const SizedBox(height: 10),

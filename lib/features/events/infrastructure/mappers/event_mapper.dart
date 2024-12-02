@@ -1,3 +1,4 @@
+import 'package:eventos_app/core/config/constants/environment.dart';
 import 'package:eventos_app/features/events/domain/entities/agenda_day.dart';
 import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/features/events/infrastructure/mappers/agenda_day_mapper.dart';
@@ -18,7 +19,7 @@ class EventMapper {
       endTime: parseTimeOfDay(json["endTime"]),
       differentSchedulesPerDay: json["differentSchedulesPerDay"] ?? false,
       location: json["location"] ?? '',
-      headerImage: json["headerImage"] ?? '',
+      headerImage: _rebuildImageUrl(json["headerImage"]),
       inscriptionStartDate: json["inscriptionStartDate"] != null 
         ? DateTime.parse(json["inscriptionStartDate"])
         : DateTime.now(),
@@ -49,6 +50,15 @@ class EventMapper {
       linkedin: json["linkedin"] ?? '',
       createdAt: DateTime.parse(json["createdAt"]),
     );
+  }
+
+
+  /// Reconstruye la URL completa de la imagen si es necesario.
+  static String _rebuildImageUrl(String? imageName) {
+    if (imageName == null || imageName.startsWith('http')) {
+      return imageName ?? ''; // Devolver directamente si ya es una URL
+    }
+    return '${Environment.apiUrl}/api/files/event/$imageName';
   }
 
 

@@ -1,13 +1,14 @@
-  import 'package:eventos_app/features/events/domain/entities/event.dart';
-  import 'package:eventos_app/shared/helpers/date_picker_helper.dart';
-  import 'package:eventos_app/shared/helpers/time_picker_helper.dart';
-  import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
-  import 'package:eventos_app/shared/shared.dart';
-  import 'package:eventos_app/shared/widgets/custom_checkbox.dart';
-  import 'package:eventos_app/features/events/presentation/widgets/custom_image_picker_field.dart';
-  import 'package:flutter/material.dart';
-  import 'package:flutter_riverpod/flutter_riverpod.dart';
-  import 'package:image_picker/image_picker.dart';
+
+import 'package:eventos_app/features/events/domain/entities/event.dart';
+import 'package:eventos_app/shared/helpers/date_picker_helper.dart';
+import 'package:eventos_app/shared/helpers/time_picker_helper.dart';
+import 'package:eventos_app/features/events/presentation/providers/create_event_form_provider.dart';
+import 'package:eventos_app/shared/services/image_service_impl.dart';
+import 'package:eventos_app/shared/shared.dart';
+import 'package:eventos_app/shared/widgets/custom_checkbox.dart';
+import 'package:eventos_app/features/events/presentation/widgets/custom_image_picker_field.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
   class DatosDelEventoForm extends ConsumerWidget {
     final Event? event;
@@ -18,7 +19,7 @@
 
       final eventFormState = ref.watch(createEventFormProvider(event!));
       final eventFormNotifier = ref.read(createEventFormProvider(event!).notifier);
-
+      
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -174,12 +175,11 @@
               icon: const Icon(Icons.add_photo_alternate_outlined,
                   color: Colors.black45, size: 25),
               onPressed: () async {
-                final picker = ImagePicker();
-                final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                if (pickedFile != null) {
-                  final imagePath = pickedFile.path; // Ruta como String
-                  eventFormNotifier.onImageChanged(imagePath); // Envía la ruta como String
-                }
+                final  photoPath = await ImageServiceImpl().selectPhoto();
+                if(photoPath == null ) return;
+                eventFormNotifier.onImageChanged(photoPath);
+                photoPath;
+                            
               },
             ),
             onPickImage: () {},

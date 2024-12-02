@@ -1,9 +1,9 @@
 
+import 'package:eventos_app/core/config/constants/environment.dart';
 import 'package:eventos_app/features/auth/domain/entities/entities.dart';
 import 'package:eventos_app/features/events/domain/entities/activity.dart';
 import 'package:eventos_app/features/events/enum/payment_method.dart';
 import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
-import 'package:eventos_app/features/events/presentation/providers/events_repository_provider.dart';
 import 'package:eventos_app/shared/helpers/date_time_formatters.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
 import 'package:eventos_app/shared/helpers/parse_time_of_day.dart';
@@ -559,9 +559,9 @@ class CreateEventFormNotifier extends StateNotifier<EventFormState>{
 
   void onImageChanged(String imagePath) {
     final imageName = imagePath.split('/').last; // Extrae el nombre de la imagen
-
     state = state.copyWith(
-      headerImageName: imageName, // Actualiza el nombre de la imagen
+      headerImage: imagePath, 
+      headerImageName: imageName,
       isValid: Formz.validate([
         state.name,
         state.description,
@@ -965,7 +965,7 @@ void removeActivity(String dia, int index) {
       'endTime': timeOfDayToString(state.endTime), // Convertir TimeOfDay a String
       'differentSchedulesPerDay': state.differentSchedulesPerDay,
       'location': state.location.value,
-      'headerImage': state.headerImage,
+      'headerImage': state.headerImage.replaceAll('${ Environment.apiUrl }/files/event/', ''),
       'inscriptionStartDate': state.inscriptionStartDate.value?.toIso8601String(),
       'inscriptionEndDate': state.inscriptionEndDate.value?.toIso8601String(),
       'inscriptionStartTime': timeOfDayToString(state.inscriptionStartTime), // Convertir TimeOfDay a String

@@ -40,12 +40,12 @@ class CustomImagePickerField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(
-                  imageName ?? hint,
+                  imageName?.isNotEmpty == true ? imageName! : hint, // Muestra el nombre de la imagen o el hint si no hay imagen
                   style: TextStyle(
                     fontSize: 14,
                     color: errorMessage != null 
                       ? Colors.red.shade800 
-                      :  (imageName != null ? Colors.black87 : Colors.black54),
+                      : (imageName?.isNotEmpty == true ? Colors.black87 : Colors.black54),
                   ),
                 ),
               ),

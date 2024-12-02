@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:eventos_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/features/events/presentation/providers/events_provider.dart';
 import 'package:eventos_app/shared/helpers/form_date.dart';
@@ -45,6 +47,8 @@ class HomeViewState extends ConsumerState{
     final textTheme = Theme.of(context).textTheme;
     final eventsState = ref.watch(eventsProvider);
     final currentUserId = ref.watch(authProvider).currentUserId;
+
+    
 
     return Scaffold(
       appBar: const CustomAppbar(),
@@ -139,6 +143,7 @@ class HomeViewState extends ConsumerState{
                   controller: scrollController,
                   itemCount: eventsState.events.length, /// hacer length para determinar la cantidad de eventos a mostrar
                   itemBuilder: (context, index) {
+                    
                     final event = eventsState.events[index];
                     final isCreator = currentUserId == event.createdBy;
 
@@ -151,13 +156,7 @@ class HomeViewState extends ConsumerState{
                           SizedBox(
                             width: double.infinity, // Toma todo el ancho disponible
                             height: 200,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                'https://www.jordicarrio.com/content/img/gal/7185/c1706-1289-art.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                            child: buildEventImage(event.headerImage), 
                           ),
 
                           const SizedBox(height: 5),
@@ -246,4 +245,36 @@ class HomeViewState extends ConsumerState{
       bottomNavigationBar: const CustomNavigationbar()
     );
   }
+}
+
+
+Widget buildEventImage(String headerImage) {
+  late ImageProvider imageProvider;
+
+  if (headerImage.isEmpty) {
+    // Mostrar una imagen predeterminada si no hay una imagen
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
+      child: Image.network(
+        'https://www.jordicarrio.com/content/img/gal/7185/c1706-1289-art.jpg',
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  // Determinar si la imagen es una URL o un archivo local
+  if (headerImage.startsWith('http')) {
+    imageProvider = NetworkImage(headerImage);
+  } else {
+    imageProvider = FileImage(File(headerImage));
+  }
+
+  return ClipRRect(
+    borderRadius: const BorderRadius.all(Radius.circular(20)),
+    child: FadeInImage(
+      fit: BoxFit.cover,
+      image: imageProvider,
+      placeholder: const NetworkImage('https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjZxeG1iYzJmejNidWtyeTZ3MWdzaGZ1OXRvcHA5ZTZscmhvd3cyeiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif'),
+    ),
+  );
 }

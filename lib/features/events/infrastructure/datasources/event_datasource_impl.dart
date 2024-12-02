@@ -20,6 +20,48 @@ class EventDatasourceImpl extends EventsDatasource {
       }
     ));
 
+  // Future<String> _uploadPhoto ( String photo) async{
+    
+  //   if (!photo.contains('/')) {
+  //     return photo; // Si no contiene '/', asumimos que ya es una URL y no necesita subirse
+  //   }
+
+  //   final Future<String> uploadJob = photo.contains('/') 
+  //     ? _uploadFile(photo) // Si es un archivo local, subimos
+  //     : Future.value(photo);
+      
+  //     return await uploadJob; // Si ya es una URL, lo retornamos directamente
+  // }
+
+  Future<String> _uploadFile (String path) async{
+
+    try {
+      
+      final fileName  = path.split('/').last;
+
+      final FormData data = FormData.fromMap({
+        'image': MultipartFile.fromFileSync(path, filename: fileName),
+      });
+
+      final response = await dio.post('/api/files/event', data: data );
+      return response.data['image'];
+
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  Future<String> _uploadPhoto(String photo) async {
+    // Verificar si es una URL remota
+    if (photo.startsWith('http://') || photo.startsWith('https://')) {
+      return photo; // Es una URL, no subir
+    }
+
+    // Si contiene '/', subimos el archivo y retornamos la URL generada
+    final String uploadedPhotoUrl = await _uploadFile(photo);
+    return uploadedPhotoUrl;
+  }
+
 
   @override
   Future<Event> createUpdateEvent(Map<String, dynamic> eventLike) async {
@@ -30,7 +72,7 @@ class EventDatasourceImpl extends EventsDatasource {
       final String method = ( eventId == null) ? 'POST' : 'PATCH';
       final String url = (eventId == null) ?'/api/create-events' :'/api/update-event/$eventId';
       eventLike.remove('id');
-
+      eventLike['headerImage'] = await _uploadPhoto(eventLike['headerImage']);
 
       final response = await dio.request(
         url,

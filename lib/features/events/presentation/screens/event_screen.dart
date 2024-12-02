@@ -234,7 +234,9 @@ class _CustomSliverAppBar extends StatelessWidget {
           children: [
             SizedBox.expand(
               child: Image.network(
-                "https://media.istockphoto.com/id/525560961/es/foto/segovia-espa%C3%B1a-acueducto.jpg?s=612x612&w=0&k=20&c=dAebHX1SW41UbXCnD49TM467w3GjA_wIe6G8Z6pBPNI=",
+                event.headerImage.isNotEmpty
+                  ? event.headerImage 
+                  : "https://media.istockphoto.com/id/525560961/es/foto/segovia-espa%C3%B1a-acueducto.jpg?s=612x612&w=0&k=20&c=dAebHX1SW41UbXCnD49TM467w3GjA_wIe6G8Z6pBPNI=",
                 fit: BoxFit.cover,
               ),
             ),

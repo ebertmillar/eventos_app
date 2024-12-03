@@ -1,11 +1,13 @@
 import 'package:eventos_app/core/config/router/app_router_notifier.dart';
 import 'package:eventos_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:eventos_app/features/auth/presentation/screens/check_auth_status_screen.dart';
+import 'package:eventos_app/features/events/domain/entities/event.dart';
 import 'package:eventos_app/features/events/presentation/screens/create_event_screen.dart';
 import 'package:eventos_app/features/auth/presentation/screens/home_screen.dart';
 import 'package:eventos_app/features/auth/presentation/screens/register_user_screen.dart';
 import 'package:eventos_app/features/auth/presentation/screens/splash_screen.dart';
 import 'package:eventos_app/features/events/presentation/screens/event_screen.dart';
+import 'package:eventos_app/features/events/presentation/screens/inscription_screen.dart';
 import 'package:eventos_app/features/events/presentation/screens/tickets_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -57,6 +59,14 @@ final goRouterProvider = Provider((ref) {
           eventId: state.pathParameters['id'] ?? 'no-id',
           
         ), 
+      ),
+
+      GoRoute(
+        path: '/inscription',
+        builder: (context, state) {
+          final event = state.extra as Event; // Recupera el evento enviado
+          return InscriptionScreen(event: event);
+        }
       ),
     ],
     redirect: (context, state) {

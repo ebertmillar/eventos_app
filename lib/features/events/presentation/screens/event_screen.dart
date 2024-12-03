@@ -5,6 +5,7 @@ import 'package:eventos_app/shared/shared.dart';
 import 'package:eventos_app/shared/widgets/full_screen_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class EventScreen extends ConsumerWidget {
   final String eventId;
@@ -101,9 +102,11 @@ class _EventDetails extends StatelessWidget {
             
             const SizedBox(height: 25),
 
-            const Center(
+            Center(
               child: CustomFilledButton(
                 text: 'Inscribirse',
+                onPressed: 
+                 () =>  GoRouter.of(context).go('/inscription', extra: event)
                 
               ),
             ),
@@ -277,4 +280,12 @@ class _CustomSliverAppBar extends StatelessWidget {
       ),
     );
   }
+}
+
+bool isInscriptionValid(Event event) {
+  final now = DateTime.now();
+  final startInscription = DateTime.now(); // Inscripción empieza hoy
+  final endInscription = event.startDate; // Inscripción termina al inicio del evento
+
+  return now.isAfter(startInscription) && now.isBefore(endInscription) || now.isAtSameMomentAs(endInscription);
 }

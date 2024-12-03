@@ -7,6 +7,7 @@ environment:
   sdk: ^3.5.3
 
 dependencies:
+  card_swiper: ^3.0.1
   cloud_functions: ^5.1.4
   country_code_picker: ^3.1.0
   country_picker: ^2.0.26

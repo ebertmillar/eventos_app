@@ -79,6 +79,7 @@ final goRouterProvider = Provider((ref) {
 
       if (authStatus == AuthStatus.notAuthenticated) {
         if (isGoingTo == '/checking') return '/';
+        if (isGoingTo.startsWith('/inscription')) return '/register';
         if (isGoingTo.startsWith('/create-event')) return '/register'; // Redirige al registro si no está autenticado
       }
 

@@ -5,6 +5,7 @@ class KeyValueServiceImpl extends KeyValueStorage {
 
   Future<SharedPreferences> getSharedPrefs() async {
     return await SharedPreferences.getInstance();
+    
   }
 
   @override
@@ -14,7 +15,10 @@ class KeyValueServiceImpl extends KeyValueStorage {
     if (T == int) {
       return prefs.getInt(key) as T;
     } else if (T == String) {
-      return (prefs.getString(key) ?? '') as T;
+      final value = prefs.getString(key);
+      print('Valor recuperado para $key: $value');
+      return value as T?;
+      
     } else {
       throw UnimplementedError('No está implementado para el tipo de dato : ${T.runtimeType}');
     }

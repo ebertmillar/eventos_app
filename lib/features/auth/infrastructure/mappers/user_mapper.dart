@@ -31,7 +31,7 @@ class UserMapper {
       fullName: '',
       companyName: '',
       nif: '',
-      telefono: '',
+      telefono: json["telefono"] ?? '',
       sector: '',
       isActive: true,  // Asume que el usuario está activo si está autenticado
       aceptaTerminos: false,

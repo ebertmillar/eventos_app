@@ -107,36 +107,57 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
   }
 
 
-  void _setLoggedUser (User user) async {
+  void _setLoggedUser(User user) async {
+    // Primero autenticar al usuario con el customToken
+    await FirebaseAuth.instance.signInWithCustomToken(user.token);
 
-    // Obtener idToken a partir del customToken y guardarlo en el almacenamiento
+   // Luego obtener el idToken
     final idToken = await FirebaseAuth.instance.currentUser?.getIdToken() ?? '';
+
+    if (idToken.isEmpty) {
+      throw CustomError('Error: El ID token no se pudo generar.');
+    }
+
+     // Guardar el idToken en SharedPreferences
     await keyValueStorage.setKeyValue('token', idToken);
-     print('Usuario autenticado:');
-      print('Email: ${user.email}');
-      print('ID Token: $idToken');
-
-    // Usa el idToken directamente y guárdalo en SharedPreferences
-  
-  await keyValueStorage.setKeyValue('token', idToken);
-
+    print('Usuario autenticado:');
+    print('Email: ${user.email}');
+    print('ID Token: $idToken');
 
     state = state.copyWith(
-    user: user,
-    authStatus: AuthStatus.authenticated,
-    idToken: idToken,
-    currentUserId: user.id,
-    errorMessage: '',
+      user: user,
+      authStatus: AuthStatus.authenticated,
+      idToken: idToken,
+      currentUserId: user.id,
+      errorMessage: '',
     );
   }
 
   Future<String> getIdToken(String customToken) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCustomToken(customToken);
-      String idToken = await userCredential.user?.getIdToken() ?? '';
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      print("Sign-in successful.");
+
+      final idToken = await userCredential.user?.getIdToken(true) ?? '';
+      if (idToken.isEmpty) {
+        throw CustomError("No se pudo obtener el ID token.");
+      }
       return idToken;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case "invalid-custom-token":
+          print("El token proporcionado no es un token de autenticación personalizado válido.");
+          break;
+        case "custom-token-mismatch":
+          print("El token proporcionado es para un proyecto Firebase diferente.");
+          break;
+        default:
+          print("Error desconocido en la autenticación.");
+      }
+      throw CustomError("Error de autenticación: ${e.message}");
     } catch (e) {
-      throw CustomError('Error al obtener el idToken: $e');
+      throw CustomError('Error al obtener el ID token: $e');
     }
   }
 
